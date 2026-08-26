@@ -18,23 +18,15 @@ h1 em { color: var(--sun); font-style: normal; }
 .primary-button { display: inline-flex; gap: 28px; align-items: center; padding: 17px 22px; border-radius: 16px; color: var(--deep); background: var(--sun); box-shadow: 0 10px 0 #c8872f; text-decoration: none; font-weight: 950; transition: transform .2s; }
 .primary-button:hover { transform: translateY(-3px); }
 .privacy-note { margin-top: 22px; color: #b9dedb; font-size: .82rem; }
-.island-scene { position: relative; min-height: 560px; }
-.sun { position: absolute; width: 310px; height: 310px; border: 1px solid rgba(244,201,93,.5); border-radius: 50%; top: 55px; left: 120px; box-shadow: 0 0 0 40px rgba(244,201,93,.05), 0 0 0 80px rgba(244,201,93,.03); }
-.island { position: absolute; width: 185px; height: 390px; top: 80px; left: 190px; background: linear-gradient(150deg, #77cf9c, #1b8a71 65%, #0b655b); border: 8px solid rgba(255,255,255,.9); border-radius: 45% 55% 56% 44% / 19% 22% 78% 81%; transform: rotate(13deg); box-shadow: 0 35px 50px rgba(1,38,53,.35); }
-.island::before, .island::after { content: ""; position: absolute; border-radius: 50%; background: #d9f5df; opacity: .65; }
-.island::before { width: 38px; height: 100px; top: 90px; left: 40px; transform: rotate(-28deg); }
-.island::after { width: 22px; height: 75px; bottom: 70px; right: 38px; transform: rotate(20deg); }
-.island span { position: absolute; top: 165px; left: 35px; color: rgba(3,64,62,.65); font-size: .74rem; font-weight: 900; letter-spacing: .24em; transform: rotate(77deg); }
-.orbit { position: absolute; color: var(--sun); font-size: 2rem; }
-.orbit-one { top: 35px; left: 80px; }.orbit-two { bottom: 50px; right: 40px; color: #9ee8dc; }
-.scene-card { position: absolute; min-width: 145px; padding: 14px 16px; border: 1px solid rgba(255,255,255,.55); border-radius: 14px; color: var(--deep); background: rgba(255,253,245,.94); box-shadow: 0 14px 30px rgba(1,38,53,.24); }
-.scene-card b, .scene-card small { display: block; }.scene-card b { font-size: .95rem; }.scene-card small { margin-top: 4px; color: #547076; }
-.card-map { top: 55px; right: 5px; transform: rotate(3deg); }.card-history { bottom: 75px; left: 5px; transform: rotate(-3deg); }.card-nature { bottom: 20px; right: 30px; transform: rotate(2deg); }
+.hero-art { position: relative; margin: 0; padding: 10px; border: 1px solid rgba(255,255,255,.35); border-radius: 26px; background: rgba(255,255,255,.1); box-shadow: 0 30px 70px rgba(1,35,50,.38); transform: rotate(1.2deg); }
+.hero-art::before { content: "主視覺"; position: absolute; top: -16px; right: 28px; padding: 8px 13px; border-radius: 999px; color: var(--deep); background: var(--sun); font-size: .72rem; font-weight: 950; letter-spacing: .08em; }
+.hero-art img { display: block; width: 100%; height: auto; border-radius: 18px; }
+.hero-art figcaption { padding: 13px 8px 4px; color: #c9e7e4; font-size: .78rem; text-align: center; }
 .wave { position: absolute; height: 34px; left: 0; right: 0; bottom: -1px; background: var(--paper); clip-path: polygon(0 70%, 10% 45%, 20% 75%, 33% 35%, 48% 70%, 63% 40%, 78% 75%, 90% 42%, 100% 64%, 100% 100%, 0 100%); }
 .mission-intro { max-width: 900px; margin: auto; padding: 90px 24px; text-align: center; }.mission-intro .eyebrow { color: var(--teal); }.mission-intro h2 { margin: 0; font-size: clamp(2rem, 4vw, 3.3rem); letter-spacing: -.04em; }
 :focus-visible { outline: 4px solid var(--sun); outline-offset: 4px; }
-@media (max-width: 820px) { .hero-grid { grid-template-columns: 1fr; padding-top: 48px; }.island-scene { min-height: 500px; transform: scale(.9); transform-origin: top center; }.progress-pill { display: none; } }
-@media (max-width: 480px) { .topbar, .hero-grid { width: min(100% - 28px, 1180px); }.brand { font-size: .9rem; }.island-scene { margin-left: -24px; margin-right: -24px; }.scene-card { min-width: 130px; }.card-map { right: 0; } }
+@media (max-width: 820px) { .hero-grid { grid-template-columns: 1fr; padding-top: 48px; }.hero-art { margin: 12px 0 20px; transform: none; }.progress-pill { display: none; } }
+@media (max-width: 480px) { .topbar, .hero-grid { width: min(100% - 28px, 1180px); }.brand { font-size: .9rem; }.hero-art { padding: 6px; border-radius: 18px; }.hero-art img { border-radius: 13px; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; }.primary-button { transition: none; } }
 
 button, input { font: inherit; }

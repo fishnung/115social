@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
 type Choice = { prompt: string; options: string[]; answer: number; why: string; hint: string };
@@ -140,7 +141,7 @@ export default function Home() {
   return <main>
     <section className="hero" aria-labelledby="hero-title"><nav className="topbar" aria-label="主要導覽"><a className="brand" href="#top"><span className="brand-mark" aria-hidden="true">島</span><span>臺灣時空探險隊</span></a><div className="nav-links"><a href="#missions">任務地圖</a><a href="#quiz">單元測驗</a><a href="#finish">結業站</a></div><span className="progress-pill">探索進度 {progress}%</span></nav>
       <div className="hero-grid" id="top"><div className="hero-copy"><p className="eyebrow">五年級社會・第一單元</p><h1 id="hero-title">讀懂一座島，<br/><em>找到我們的足跡。</em></h1><p className="lead">從海洋位置、地下遺物到山林智慧，蒐集三枚證據徽章，完成守護臺灣的時空任務。</p><a className="primary-button" href="#base">開始探險 <span aria-hidden="true">→</span></a><p className="privacy-note">免登入即可學習・進度只保存在這個裝置</p></div>
-        <div className="island-scene" aria-label="臺灣島概念圖"><div className="sun" aria-hidden="true"/><div className="island" aria-hidden="true"><span>TAIWAN</span></div><div className="scene-card card-map"><b>海島羅盤</b><small>位置 × 氣候</small></div><div className="scene-card card-history"><b>考古探鏟</b><small>遺物 × 推論</small></div><div className="scene-card card-nature"><b>共生葉片</b><small>文化 × 永續</small></div></div></div><div className="wave" aria-hidden="true"/></section>
+        <figure className="hero-art"><Image src="/og.png" alt="臺灣時空探險隊主視覺：臺灣島結合海洋、考古地層、山林、陶片與玉器，主題為位置、足跡與共生智慧" width={1733} height={909} priority/><figcaption>從海洋到山林，沿著證據讀懂臺灣。</figcaption></figure></div><div className="wave" aria-hidden="true"/></section>
 
     <section className="section base-section" id="base"><div className="section-heading"><div><p className="eyebrow dark">出發前・不計分</p><h2>先備基地</h2></div><p>先確認方向、地圖和時間感。答錯沒關係，提示會帶你找到線索。</p></div><div className="warmups">{prerequisites.map((q,i)=><ChoiceTask key={q.prompt} item={q} taskKey={`p${i}`} saved={saved} setSaved={setSaved} unscored/>)}</div></section>
 
