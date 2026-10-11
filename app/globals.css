@@ -74,6 +74,10 @@ button { cursor: pointer; }
 .card-count { position: absolute; top: -15px; right: 10px; color: rgba(8,51,68,.06); font-size: 6.5rem; font-weight: 950; }
 .card-tag { display: inline-block; margin: 0 0 16px; padding: 6px 10px; border-radius: 8px; color: #075985; background: #e3f4f9; font-size: .75rem; font-weight: 950; }
 .knowledge-card h3 { position: relative; margin: 0 0 14px; font-size: 1.45rem; }.knowledge-card > p:last-child { position: relative; margin: 0; color: #4f6970; line-height: 1.82; }
+.unit2 .knowledge-card { min-height: 390px; display: flex; flex-direction: column; }
+.unit2 .knowledge-card .card-body { position: relative; margin: 0; color: #4f6970; line-height: 1.82; }
+.unit2 .knowledge-card .card-bridge { margin: auto 0 0; padding: 14px; border-radius: 12px; color: #35535b; background: #edf7f5; font-size: .82rem; line-height: 1.6; }
+.unit2 .knowledge-card .card-bridge b { display: block; margin-bottom: 3px; color: var(--teal); }
 .knowledge-card.is-hint { outline: 5px solid var(--sun); outline-offset: 5px; background: #fffbed; box-shadow: 0 0 0 10px rgba(244,201,93,.25), 0 18px 38px rgba(8,51,68,.16); animation: card-hint 1.1s ease-in-out 2; }
 .knowledge-card.is-hint::after { content: "提示卡：答案藏在這裡"; position: absolute; right: 16px; bottom: 15px; padding: 7px 10px; border-radius: 999px; color: #5d3d00; background: var(--sun); font-size: .72rem; font-weight: 950; }
 @keyframes card-hint { 50% { transform: translateY(-7px); } }
