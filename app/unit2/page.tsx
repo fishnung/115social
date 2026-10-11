@@ -64,12 +64,18 @@ const quiz: (Choice & { concept: string })[] = [
 ];
 
 const classifyItems = [
-  { text: "用羅馬字母拼寫原住民語言", answer: "文化交流" },
-  { text: "三貂角源自 San Tiago", answer: "文化交流" },
-  { text: "新營、左營、前鎮", answer: "漢人社會" },
-  { text: "興建孔廟與設立學校", answer: "漢人社會" },
-  { text: "大肚王國土地被占領", answer: "族群衝擊" },
-  { text: "用口述與文獻重建地方史", answer: "族群衝擊" },
+  { text: "用羅馬字母拼寫原住民語言", answer: "跨文化交流", why: "語言與傳教方式在不同文化之間流動。" },
+  { text: "三貂角源自 San Tiago", answer: "跨文化交流", why: "西班牙語轉化成今日地名，是文化接觸的痕跡。" },
+  { text: "新營、左營、前鎮", answer: "鄭氏經營", why: "『營』『鎮』是鄭氏軍隊駐守與屯墾留下的地名。" },
+  { text: "興建孔廟與設立學校", answer: "鄭氏經營", why: "鄭氏透過教育推動漢人社會與文化。" },
+  { text: "大肚王國土地被占領", answer: "原住民族歷史", why: "這項證據呈現平埔族群面對土地衝突的經驗。" },
+  { text: "用口述與文獻重建地方史", answer: "原住民族歷史", why: "這些方法讓被忽略的族群歷史重新被看見。" },
+];
+
+const classifyCategories = [
+  { name: "跨文化交流", clue: "找語言、宗教、外來地名或物種" },
+  { name: "鄭氏經營", clue: "找軍隊屯墾、教育或漢人社會" },
+  { name: "原住民族歷史", clue: "找土地衝突、遷移或歷史重建" },
 ];
 
 function InquiryTool({ lesson }: { lesson: Lesson }) {
@@ -80,8 +86,8 @@ function InquiryTool({ lesson }: { lesson: Lesson }) {
   function move(from:number,to:number){if(to<0||to>=order.length)return;setOrder(items=>{const next=[...items];const [item]=next.splice(from,1);next.splice(to,0,item);return next});setChecked(false);}
   function drop(to:number){if(dragged===null)return;move(dragged,to);setDragged(null);}
   if(lesson.id===1){const correct=order.every((value,index)=>value===index);return <div className="inquiry interactive-inquiry"><div className="tool-copy"><p className="eyebrow dark">動手探究・排列順序</p><h3>{lesson.tool.title}</h3><p>拖曳卡片，或使用上下按鈕，將事件依年代由早到晚排列。</p></div><div className="sequence-tool"><ol>{order.map((itemIndex,index)=><li key={itemIndex} draggable onDragStart={()=>setDragged(index)} onDragOver={event=>event.preventDefault()} onDrop={()=>drop(index)}><span className="drag-grip" aria-hidden="true">⠿</span><b>{lesson.tool.items[itemIndex]}</b><span className="move-buttons"><button aria-label={`將${lesson.tool.items[itemIndex]}往上移`} disabled={index===0} onClick={()=>move(index,index-1)}>↑</button><button aria-label={`將${lesson.tool.items[itemIndex]}往下移`} disabled={index===order.length-1} onClick={()=>move(index,index+1)}>↓</button></span></li>)}</ol><button className="tool-check" onClick={()=>setChecked(true)}>檢查順序</button>{checked&&<p className={`tool-result ${correct?"correct":"retry"}`} role="status">{correct?"✓ 排列正確！你已把四個政權節點接成時間線。":"還有順序需要調整。先比較每張卡最前面的年份。"}</p>}</div></div>}
-  const categories=["文化交流","漢人社會","族群衝擊"];const allDone=classifyItems.every((_,i)=>groups[i]);const correct=allDone&&classifyItems.every((item,i)=>groups[i]===item.answer);
-  return <div className="inquiry interactive-inquiry classify-inquiry"><div className="tool-copy"><p className="eyebrow dark">動手探究・證據分類</p><h3>足跡分類桌</h3><p>閱讀每張證據卡，判斷它主要屬於哪一類影響。分類後再檢查。</p><div className="category-key">{categories.map(c=><span key={c}>{c}</span>)}</div></div><div className="classify-tool">{classifyItems.map((item,i)=><div className="classify-item" key={item.text}><b>{item.text}</b><div>{categories.map(category=><button key={category} className={groups[i]===category?"chosen":""} onClick={()=>{setGroups(g=>({...g,[i]:category}));setChecked(false)}}>{category}</button>)}</div></div>)}<button className="tool-check" disabled={!allDone} onClick={()=>setChecked(true)}>檢查分類</button>{checked&&<p className={`tool-result ${correct?"correct":"retry"}`} role="status">{correct?"✓ 分類完成！你已分辨交流、社會發展與族群衝擊。":"有些證據放錯類別。想想它主要改變的是文化、漢人社會，還是原住民族處境。"}</p>}</div></div>;
+  const completed=classifyItems.filter((_,i)=>groups[i]).length;const allDone=completed===classifyItems.length;const correct=allDone&&classifyItems.every((item,i)=>groups[i]===item.answer);
+  return <div className="inquiry interactive-inquiry classify-inquiry"><div className="tool-copy"><p className="eyebrow dark">動手探究・證據分類</p><h3>先問「這項證據在說誰？」</h3><p>不要只看表面名詞。先讀三類的判斷線索，再替每張證據卡選出主要類別。</p><div className="category-guide">{classifyCategories.map(category=><div key={category.name}><b>{category.name}</b><span>{category.clue}</span></div>)}</div></div><div className="classify-tool"><p className="classify-progress">已分類 <b>{completed}／{classifyItems.length}</b></p>{classifyItems.map((item,i)=>{const itemCorrect=groups[i]===item.answer;return <div className={`classify-item ${checked?(itemCorrect?"item-correct":"item-wrong"):""}`} key={item.text}><b>{item.text}</b><div>{classifyCategories.map(category=><button key={category.name} className={groups[i]===category.name?"chosen":""} aria-pressed={groups[i]===category.name} onClick={()=>{setGroups(g=>({...g,[i]:category.name}));setChecked(false)}}>{category.name}</button>)}</div>{checked&&<p className={itemCorrect?"item-feedback good":"item-feedback try"}>{itemCorrect?`✓ ${item.why}`:`再想想：${item.why}`}</p>}</div>})}<button className="tool-check" disabled={!allDone} onClick={()=>setChecked(true)}>檢查 6 張分類</button>{checked&&<p className={`tool-result ${correct?"correct":"retry"}`} role="status">{correct?"✓ 全部分對了！你已能從證據辨認不同歷史面向。":"紅色卡片需要調整；每張卡下方都有判斷理由。"}</p>}</div></div>;
 }
 
 function ChoiceTask({ item, taskKey, saved, setSaved, unscored=false, onHint, hintCardId }: { item: Choice; taskKey: string; saved: Saved; setSaved: React.Dispatch<React.SetStateAction<Saved>>; unscored?: boolean; onHint?: (cards: number[]|null)=>void; hintCardId?: string }) {

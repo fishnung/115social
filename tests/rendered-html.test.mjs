@@ -67,6 +67,10 @@ test("第二單元包含兩課、探究任務、測驗與證書", async () => {
   assert.match(page, /draggable/);
   assert.match(page, /動手探究・證據分類/);
   assert.match(page, /classifyItems/);
+  assert.match(page, /先問「這項證據在說誰？」/);
+  assert.match(page, /已分類/);
+  assert.match(page, /item-correct/);
+  assert.match(page, /每張卡下方都有判斷理由/);
   assert.match(page, /answerVersion: 2/);
   const quizSource = page.slice(page.indexOf("const quiz"), page.indexOf("function ChoiceTask"));
   const answers = [...quizSource.matchAll(/answer: ([012])/g)].map((match) => Number(match[1]));
