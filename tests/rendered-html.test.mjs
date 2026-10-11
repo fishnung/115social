@@ -60,8 +60,13 @@ test("第二單元包含兩課、探究任務、測驗與證書", async () => {
   assert.match(page, /highlightedCards\.includes\(cardKey\)\?"is-hint"/);
   assert.match(page, /查看上方發亮的知識卡/);
   assert.match(page, /對中國、日本的貿易成長有限/);
-  assert.match(page, /今日族人、學者及文史工作者透過口述、文獻與研究/);
+  assert.match(page, /今日透過族人口述、文獻與研究重建地方史/);
   assert.equal((page.match(/bridge: "/g) ?? []).length, 6);
+  assert.equal((page.match(/visual: \[/g) ?? []).length, 6);
+  assert.match(page, /動手探究・排列順序/);
+  assert.match(page, /draggable/);
+  assert.match(page, /動手探究・證據分類/);
+  assert.match(page, /classifyItems/);
   assert.match(page, /answerVersion: 2/);
   const quizSource = page.slice(page.indexOf("const quiz"), page.indexOf("function ChoiceTask"));
   const answers = [...quizSource.matchAll(/answer: ([012])/g)].map((match) => Number(match[1]));
