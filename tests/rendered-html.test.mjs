@@ -55,4 +55,9 @@ test("第二單元包含兩課、探究任務、測驗與證書", async () => {
   assert.match(page, /quizBest>=80/);
   assert.match(page, /application\/pdf/);
   assert.match(page, /localStorage/);
+  assert.match(page, /證據線索/);
+  assert.match(page, /answerVersion: 2/);
+  const quizSource = page.slice(page.indexOf("const quiz"), page.indexOf("function ChoiceTask"));
+  const answers = [...quizSource.matchAll(/answer: ([012])/g)].map((match) => Number(match[1]));
+  assert.deepEqual(answers.reduce((counts, answer) => (counts[answer]++, counts), [0, 0, 0]), [5, 5, 5]);
 });

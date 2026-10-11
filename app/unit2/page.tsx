@@ -3,16 +3,16 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
-type Choice = { prompt: string; options: string[]; answer: number; why: string; hint: string };
+type Choice = { prompt: string; options: string[]; answer: number; why: string; hint: string; evidence?: string };
 type Lesson = { id: number; icon: string; kicker: string; title: string; question: string; color: string; concepts: string[]; cards: { tag: string; title: string; text: string }[]; tool: { title: string; intro: string; items: string[] }; challenges: Choice[]; scenario: Choice };
-type Saved = { correct: Record<string, boolean>; quizBest: number; quizAnswers: number[]; name: string };
+type Saved = { correct: Record<string, boolean>; quizBest: number; quizAnswers: number[]; name: string; answerVersion: number };
 
 const STORE = "taiwan-explorer-unit2-v1";
-const emptySaved: Saved = { correct: {}, quizBest: 0, quizAnswers: Array(15).fill(-1), name: "" };
+const emptySaved: Saved = { correct: {}, quizBest: 0, quizAnswers: Array(15).fill(-1), name: "", answerVersion: 2 };
 
 const prerequisites: Choice[] = [
-  { prompt: "臺灣位在東亞海域，為什麼容易成為航運據點？", options: ["位在往來中國、日本與東南亞的中途", "完全遠離所有航路", "四周都是陸地"], answer: 0, why: "臺灣位於東亞海運要道，適合作為往來與轉運據點。", hint: "想想船隻往返東北亞與東南亞時的位置。" },
-  { prompt: "史料寫著西元 1624 年，屬於哪一個世紀？", options: ["17 世紀", "16 世紀", "18 世紀"], answer: 0, why: "1601～1700 年屬於 17 世紀。", hint: "世紀通常比年份前兩位多一。" },
+  { prompt: "臺灣位在東亞海域，為什麼容易成為航運據點？", options: ["完全遠離所有航路", "位在往來中國、日本與東南亞的中途", "四周都是陸地"], answer: 1, why: "臺灣位於東亞海運要道，適合作為往來與轉運據點。", hint: "先找中國、日本和東南亞，再觀察臺灣是不是位在它們之間。", evidence: "地圖線索：臺灣位在中國東南、日本西南與菲律賓北方之間。" },
+  { prompt: "史料寫著西元 1624 年，屬於哪一個世紀？", options: ["18 世紀", "16 世紀", "17 世紀"], answer: 2, why: "1601～1700 年屬於 17 世紀。", hint: "把 1624 放進世紀範圍：1601～1700 年。", evidence: "年代線索：第 1 世紀是西元 1～100 年，世紀的起點是 01 年。" },
   { prompt: "研究不同族群的衝突時，哪種做法較可靠？", options: ["比較多方記錄與證據", "只看單一統治者說法", "依個人想像判斷"], answer: 0, why: "交叉比較不同立場與證據，較能理解事件全貌。", hint: "歷史事件中的每個角色可能有不同觀點。" },
 ];
 
@@ -25,11 +25,11 @@ const lessons: Lesson[] = [
     ],
     tool: { title: "時間軸 × 動機矩陣", intro: "把年份、行動與目的連起來，辨認各勢力的選擇不是孤立事件。", items: ["1624：荷蘭據臺南—建立轉運站", "1626：西班牙據北臺—爭奪航路", "1642：荷蘭控制北部—排除競爭", "1662～1684：鄭氏政權—根據地與經營"] },
     challenges: [
-      { prompt: "荷蘭人選臺南設立據點，最主要的目的為何？", options: ["經營東亞貿易轉運", "前往北極探險", "停止所有海上交易"], answer: 0, why: "臺灣位在東亞貿易圈中，臺南據點便於行政、商業與轉運。", hint: "注意教材中的「貿易轉運站」。" },
-      { prompt: "哪一組事件的先後順序正確？", options: ["荷蘭來臺→西班牙來臺→鄭成功迫荷蘭離臺", "鄭成功來臺→荷蘭來臺→西班牙來臺", "西班牙離臺→荷蘭來臺→西班牙來臺"], answer: 0, why: "三個關鍵年份依序是 1624、1626、1662。", hint: "先比較 1624、1626 與 1662。" },
-      { prompt: "西班牙人為何逐漸不重視北臺灣據點？", options: ["貿易成長有限且維持成本高", "已控制整個東亞", "臺灣沒有港口"], answer: 0, why: "收益有限、駐守費用龐大，使西班牙降低投入，後遭荷蘭進攻撤離。", hint: "從收益與成本兩面思考。" },
+      { prompt: "荷蘭人選臺南設立據點，最主要的目的為何？", options: ["停止所有海上交易", "經營東亞貿易轉運", "前往北極探險"], answer: 1, why: "臺灣位在東亞貿易圈中，臺南據點便於行政、商業與轉運。", hint: "把『東亞航路中途』和『建立商館、出口鹿皮與蔗糖』兩項線索連起來。", evidence: "知識卡 1＋探究工具第 1 格：位置在航路中途，行動是建立轉運站。" },
+      { prompt: "哪一組事件的先後順序正確？", options: ["鄭成功來臺→荷蘭來臺→西班牙來臺", "西班牙離臺→荷蘭來臺→西班牙來臺", "荷蘭來臺→西班牙來臺→鄭成功迫荷蘭離臺"], answer: 2, why: "三個關鍵年份依序是 1624、1626、1662。", hint: "先在時間軸找三個年份，再由小到大排列。", evidence: "時間軸線索：1624 荷蘭、1626 西班牙、1662 鄭成功。" },
+      { prompt: "西班牙人為何逐漸不重視北臺灣據點？", options: ["貿易成長有限且維持成本高", "已控制整個東亞", "臺灣沒有港口"], answer: 0, why: "收益有限、駐守費用龐大，使西班牙降低投入，後遭荷蘭進攻撤離。", hint: "把『對中日貿易成長有限』和『駐守耗費龐大』合併判斷。", evidence: "因果線索：收益不如預期＋維持成本高 → 減少投入 → 容易遭荷蘭攻下。" },
     ],
-    scenario: { prompt: "博物館要介紹 17 世紀臺灣，哪種策展最能呈現多元觀點？", options: ["並列原住民、漢人、荷蘭、西班牙與鄭氏的資料", "只展示勝利者的記錄", "把所有族群寫成相同立場"], answer: 0, why: "並列多方史料能看見合作、競爭與土地衝突的不同經驗。", hint: "好的歷史敘事要讓不同角色被看見。" } },
+    scenario: { prompt: "博物館要介紹 17 世紀臺灣，哪種策展最能呈現多元觀點？", options: ["只展示勝利者的記錄", "並列原住民、漢人、荷蘭、西班牙與鄭氏的資料", "把所有族群寫成相同立場"], answer: 1, why: "並列多方史料能看見合作、競爭與土地衝突的不同經驗。", hint: "比較各族群『想得到什麼』與『受到什麼影響』，不能只看單一立場。", evidence: "觀點線索：同一個貿易據點，商人可能獲利，原住民卻可能失去土地。" } },
   { id: 2, icon: "✦", kicker: "第二課・文化與社會", title: "歷史足跡調查局", color: "ochre", question: "大航海時代在臺灣留下哪些影響？誰獲益，又有誰承受代價？", concepts: ["文化足跡", "漢人社會", "地名探究", "原住民族衝擊"],
     cards: [
       { tag: "交流", title: "語言、宗教與新物種", text: "荷蘭與西班牙傳教士帶來基督宗教，並以羅馬字母拼寫原住民語言。黃牛、荷蘭豆、土芒果及三貂角地名，也留下交流痕跡。" },
@@ -38,40 +38,40 @@ const lessons: Lesson[] = [
     ],
     tool: { title: "T 表探究：地名會說故事", intro: "以『地名／歷史關聯／證據』整理線索，也檢查同一變化對各族群是否帶來不同結果。", items: ["三貂角—源自西班牙語 San Tiago", "新營、林鳳營—軍隊駐守屯墾", "左營、前鎮—鄭氏軍事單位", "清水、大肚—追索平埔族群地方史"] },
     challenges: [
-      { prompt: "荷蘭人用羅馬字母拼寫原住民語言，主要是為了什麼？", options: ["傳播基督教與教學", "發明漢字", "禁止任何書寫"], answer: 0, why: "傳教士學習在地語言，使用羅馬字母拼寫並進行傳教與教學。", hint: "想想傳教士需要如何和居民溝通。" },
-      { prompt: "新營、左營、前鎮等地名共同反映什麼歷史？", options: ["鄭氏軍隊駐守與屯墾", "西班牙人建教堂", "荷蘭人引進豌豆"], answer: 0, why: "『營』『鎮』與鄭氏軍事單位及屯墾活動有關。", hint: "觀察地名中的軍事用語。" },
-      { prompt: "哪個敘述最符合大肚王國的歷史？", options: ["中部平埔族群建立的部落聯盟，曾維持自我管理", "荷蘭人在臺南建立的城堡", "鄭氏設立的漢人學校"], answer: 0, why: "大肚王國由中部平埔族群共同建立，曾在外來勢力下保持一定自治。", hint: "找出『部落聯盟』這項關鍵特徵。" },
+      { prompt: "荷蘭人用羅馬字母拼寫原住民語言，主要是為了什麼？", options: ["禁止任何書寫", "發明漢字", "傳播基督教與教學"], answer: 2, why: "傳教士學習在地語言，使用羅馬字母拼寫並進行傳教與教學。", hint: "先找『傳教士』的目的，再判斷記錄在地語言能提供什麼幫助。", evidence: "知識卡 1：傳教士為了和原住民溝通，以羅馬字母拼寫其語言。" },
+      { prompt: "新營、左營、前鎮等地名共同反映什麼歷史？", options: ["西班牙人建教堂", "鄭氏軍隊駐守與屯墾", "荷蘭人引進豌豆"], answer: 1, why: "『營』『鎮』與鄭氏軍事單位及屯墾活動有關。", hint: "先圈出『營』『鎮』，再回到 T 表找相同的軍事用語。", evidence: "探究工具第 2、3 格：新營、左營、前鎮都連向鄭氏軍隊駐守與屯墾。" },
+      { prompt: "哪個敘述最符合大肚王國的歷史？", options: ["中部平埔族群建立的部落聯盟，曾維持自我管理", "鄭氏設立的漢人學校", "荷蘭人在臺南建立的城堡"], answer: 0, why: "大肚王國由中部平埔族群共同建立，曾在外來勢力下保持一定自治。", hint: "把『鄰近各社擁戴大肚王』與『可自我管理』連起來。", evidence: "知識卡 3：大肚王國是中部平埔族群共同建立的部落聯盟。" },
     ],
-    scenario: { prompt: "地方要重寫一段被忽略的原住民族歷史，第一步怎麼做較合適？", options: ["邀請族人、學者與文史工作者共同查證口述及文獻", "直接沿用單一殖民記錄", "把衝突與傷亡全部刪除"], answer: 0, why: "共同查證多種資料，並讓族群參與詮釋，較能尊重歷史主體與證據。", hint: "誰的歷史，就應讓誰參與說明。" } },
+    scenario: { prompt: "地方要重寫一段被忽略的原住民族歷史，第一步怎麼做較合適？", options: ["直接沿用單一殖民記錄", "把衝突與傷亡全部刪除", "邀請族人、學者與文史工作者共同查證口述及文獻"], answer: 2, why: "共同查證多種資料，並讓族群參與詮釋，較能尊重歷史主體與證據。", hint: "先問：資料是否來自不同來源？歷史主體是否參與說明？", evidence: "史料線索：殖民記錄只有一種立場，需要再與族人口述、地方文獻及研究交叉查證。" } },
 ];
 
 const quiz: (Choice & { concept: string })[] = [
-  { prompt: "臺灣在大航海時代受到重視的關鍵條件是？", options: ["位在東亞海運要道", "位在歐洲內陸", "沒有任何居民"], answer: 0, why: "臺灣位在東亞航路中途，便於建立據點。", hint: "回想位置與航路。", concept: "航運要道" },
-  { prompt: "荷蘭人於哪一年到臺南建立據點？", options: ["1624 年", "1626 年", "1684 年"], answer: 0, why: "1624 年荷蘭人進入臺灣南部。", hint: "比西班牙人早兩年。", concept: "時間軸" },
+  { prompt: "臺灣在大航海時代受到重視的關鍵條件是？", options: ["位在歐洲內陸", "位在東亞海運要道", "沒有任何居民"], answer: 1, why: "臺灣位在東亞航路中途，便於建立據點。證據是中國、日本與東南亞航線都鄰近臺灣。", hint: "回看『航路交會的島嶼』，找位置與往來地區的關係。", concept: "航運要道" },
+  { prompt: "荷蘭人於哪一年到臺南建立據點？", options: ["1684 年", "1626 年", "1624 年"], answer: 2, why: "時間軸顯示 1624 年荷蘭人進入臺灣南部，1626 年才是西班牙人來臺。", hint: "回看時間軸前兩格，辨認哪個勢力先到。", concept: "時間軸" },
   { prompt: "熱蘭遮城今日大致是哪處古蹟？", options: ["安平古堡", "紅毛城", "臺南孔廟"], answer: 0, why: "熱蘭遮城位於大員，遺跡今為安平古堡的一部分。", hint: "找臺南安平。", concept: "荷蘭據點" },
-  { prompt: "西班牙人在臺灣的主要據點位於？", options: ["基隆、淡水", "臺南、高雄", "花蓮、臺東"], answer: 0, why: "西班牙人以北部基隆、淡水為統治與貿易據點。", hint: "北臺灣。", concept: "西班牙據點" },
-  { prompt: "西班牙人離開北臺灣的直接原因之一是？", options: ["荷蘭人出兵攻打", "鄭成功攻打淡水", "清帝國攻打基隆"], answer: 0, why: "荷蘭趁西班牙投入減少時進攻，迫使其撤離。", hint: "競爭者來自南臺灣。", concept: "荷西競逐" },
+  { prompt: "西班牙人在臺灣的主要據點位於？", options: ["花蓮、臺東", "臺南、高雄", "基隆、淡水"], answer: 2, why: "知識卡顯示西班牙人 1626 年進入北部，以基隆、淡水為據點。", hint: "回看『南荷蘭、北西班牙』中的方位線索。", concept: "西班牙據點" },
+  { prompt: "西班牙人離開北臺灣的直接原因之一是？", options: ["鄭成功攻打淡水", "荷蘭人出兵攻打", "清帝國攻打基隆"], answer: 1, why: "荷蘭趁西班牙投入減少時進攻，迫使其撤離。這是『投入減少』與『外敵進攻』共同造成的結果。", hint: "時間軸 1642 年寫的是哪個勢力控制北部？", concept: "荷西競逐" },
   { prompt: "荷蘭人輸出大量鹿皮，可能造成什麼影響？", options: ["梅花鹿數量減少、生態受壓", "鹿群必然增加", "與生態完全無關"], answer: 0, why: "高強度捕獵可能使梅花鹿族群下降。", hint: "想想每年大量出口。", concept: "貿易與生態" },
-  { prompt: "鄭成功選臺灣為根據地的背景是？", options: ["反清復明與戰事受挫", "協助西班牙統治", "尋找歐洲香料"], answer: 0, why: "鄭成功在中國沿海受挫後，轉往臺灣建立根據地。", hint: "明清政權更替。", concept: "鄭氏政權" },
-  { prompt: "哪一年鄭成功迫使荷蘭人離臺？", options: ["1662 年", "1642 年", "1624 年"], answer: 0, why: "1662 年荷蘭人退出臺灣。", hint: "鄭成功去世同年。", concept: "時間軸" },
+  { prompt: "鄭成功選臺灣為根據地的背景是？", options: ["協助西班牙統治", "反清復明與戰事受挫", "尋找歐洲香料"], answer: 1, why: "知識卡顯示鄭成功在中國沿海戰事受挫後，轉往臺灣建立反清根據地。", hint: "把『明清政權更替』與『中國沿海戰事受挫』連起來。", concept: "鄭氏政權" },
+  { prompt: "哪一年鄭成功迫使荷蘭人離臺？", options: ["1624 年", "1642 年", "1662 年"], answer: 2, why: "時間軸第 4 格顯示 1662 年鄭成功迫使荷蘭人離臺。", hint: "1624 是荷蘭來臺，1642 是荷蘭控制北部，下一個關鍵年才是答案。", concept: "時間軸" },
   { prompt: "鄭氏政權的行政中心設在哪裡？", options: ["承天府（今臺南）", "基隆和平島", "臺北盆地"], answer: 0, why: "鄭成功在臺南設承天府。", hint: "沿用普羅民遮城。", concept: "鄭氏治理" },
-  { prompt: "荷蘭傳教士留下的重要語文影響是？", options: ["以羅馬字母拼寫原住民語言", "創造日文假名", "停止所有教育"], answer: 0, why: "羅馬字母記錄後來也被用於土地契約。", hint: "教材中的雙語聖經。", concept: "文化交流" },
+  { prompt: "荷蘭傳教士留下的重要語文影響是？", options: ["停止所有教育", "創造日文假名", "以羅馬字母拼寫原住民語言"], answer: 2, why: "傳教士用羅馬字母拼寫原住民語言，這種書寫後來也出現在土地契約中。", hint: "回看知識卡 1：傳教需要先記錄哪一種在地語言？", concept: "文化交流" },
   { prompt: "『三貂角』地名與哪個國家有關？", options: ["西班牙", "荷蘭", "英國"], answer: 0, why: "名稱由西班牙語 San Tiago 的發音轉化。", hint: "聖地牙哥。", concept: "地名探究" },
-  { prompt: "鄭氏設孔廟與學校的主要影響是？", options: ["推廣漢人教育文化", "傳播天主教", "停止人才選拔"], answer: 0, why: "孔廟、學校與人才選拔奠定漢人社會發展基礎。", hint: "全臺首學。", concept: "漢人社會" },
-  { prompt: "哪一項地名與軍隊屯墾最相關？", options: ["新營", "三貂角", "和平島"], answer: 0, why: "新營的『營』反映鄭氏軍隊駐守屯墾。", hint: "找軍事單位名稱。", concept: "屯墾地名" },
-  { prompt: "大肚王國是什麼性質的組織？", options: ["中部平埔族群部落聯盟", "荷蘭商業公司", "鄭氏軍隊單位"], answer: 0, why: "它由中部地區平埔族群共同建立。", hint: "由鄰近各社組成。", concept: "大肚王國" },
+  { prompt: "鄭氏設孔廟與學校的主要影響是？", options: ["傳播天主教", "推廣漢人教育文化", "停止人才選拔"], answer: 1, why: "孔廟、學校與人才選拔共同奠定漢人教育和社會發展基礎。", hint: "『全臺首學』中的『學』提供了最直接的線索。", concept: "漢人社會" },
+  { prompt: "哪一項地名與軍隊屯墾最相關？", options: ["和平島", "三貂角", "新營"], answer: 2, why: "T 表把新營的『營』連到鄭氏軍隊駐守與屯墾。", hint: "從三個地名中找出含有軍事單位用語的一個。", concept: "屯墾地名" },
+  { prompt: "大肚王國是什麼性質的組織？", options: ["荷蘭商業公司", "中部平埔族群部落聯盟", "鄭氏軍隊單位"], answer: 1, why: "大肚王國由中部鄰近各社共同建立，是平埔族群的部落聯盟。", hint: "把『鄰近各社共同建立』和『部落聯盟』連起來。", concept: "大肚王國" },
   { prompt: "理解大航海時代影響，最合適的觀點是？", options: ["同時分析交流、發展與族群衝擊", "只看貿易獲利", "只背建築名稱"], answer: 0, why: "多角度分析才能理解不同族群的經驗與長期影響。", hint: "歷史影響有正面、負面，也因角色而異。", concept: "多元觀點" },
 ];
 
 function ChoiceTask({ item, taskKey, saved, setSaved, unscored=false }: { item: Choice; taskKey: string; saved: Saved; setSaved: React.Dispatch<React.SetStateAction<Saved>>; unscored?: boolean }) {
   const [picked,setPicked]=useState<number|null>(null); const right=picked===item.answer; const done=Boolean(saved.correct[taskKey]);
   function choose(i:number){setPicked(i);if(i===item.answer&&!unscored)setSaved(s=>({...s,correct:{...s.correct,[taskKey]:true}}));}
-  return <div className={`choice-task ${done?"is-complete":""}`}><div className="task-heading">{done?"✓ 已完成":unscored?"暖身練習":"等待解鎖"}</div><h4>{item.prompt}</h4><div className="choice-grid">{item.options.map((o,i)=><button key={o} className={picked===i?(right?"right":"wrong"):""} onClick={()=>choose(i)}>{String.fromCharCode(65+i)}. {o}</button>)}</div>{picked!==null&&<p className={`feedback ${right?"good":"try"}`} role="status">{right?`答對了！${item.why}`:`再想想：${item.hint}`}</p>}</div>;
+  return <div className={`choice-task ${done?"is-complete":""}`}><div className="task-heading">{done?"✓ 已完成":unscored?"暖身練習":"等待解鎖"}</div><h4>{item.prompt}</h4>{item.evidence&&<p className="evidence-clue"><b>證據線索</b><span>{item.evidence}</span></p>}<div className="choice-grid">{item.options.map((o,i)=><button key={o} className={picked===i?(right?"right":"wrong"):""} onClick={()=>choose(i)}>{String.fromCharCode(65+i)}. {o}</button>)}</div>{picked!==null&&<p className={`feedback ${right?"good":"try"}`} role="status">{right?`證據鏈成立：${item.why}`:`連結提示：${item.hint}`}</p>}</div>;
 }
 
 function makeCertificate(name:string,score:number){const canvas=document.createElement("canvas");canvas.width=1600;canvas.height=1100;const c=canvas.getContext("2d")!;c.fillStyle="#fffaf0";c.fillRect(0,0,1600,1100);c.strokeStyle="#8a4b22";c.lineWidth=28;c.strokeRect(35,35,1530,1030);c.strokeStyle="#f4c95d";c.lineWidth=5;c.strokeRect(70,70,1460,960);c.textAlign="center";c.fillStyle="#075985";c.font="700 42px sans-serif";c.fillText("TAIWAN TIME EXPLORER",800,190);c.font="900 82px sans-serif";c.fillText("臺灣時空探險隊結業證書",800,320);c.fillStyle="#49656b";c.font="34px sans-serif";c.fillText("恭喜",800,410);c.fillStyle="#083344";c.font="900 72px sans-serif";c.fillText(name,800,515);c.fillStyle="#49656b";c.font="34px sans-serif";c.fillText("完成《臺灣登上國際舞臺》全部任務",800,610);c.fillText("能以時間、證據與多元觀點解讀大航海時代",800,670);c.fillStyle="#f9735b";c.font="900 50px sans-serif";c.fillText(`單元測驗最高成績 ${score} 分`,800,765);const date=new Intl.DateTimeFormat("zh-TW",{dateStyle:"long"}).format(new Date());c.fillStyle="#49656b";c.font="26px sans-serif";c.fillText(`完成日期：${date}`,800,875);const data=atob(canvas.toDataURL("image/jpeg",.92).split(",")[1]);const bytes=new Uint8Array(data.length);for(let i=0;i<data.length;i++)bytes[i]=data.charCodeAt(i);const enc=new TextEncoder(),parts:Uint8Array[]=[];let pos=0;const offsets:number[]=[0],add=(s:string|Uint8Array)=>{const b=typeof s==="string"?enc.encode(s):s;parts.push(b);pos+=b.length};add("%PDF-1.4\n");const obj=(n:number,body:string|Uint8Array[])=>{offsets[n]=pos;add(`${n} 0 obj\n`);if(Array.isArray(body))body.forEach(add);else add(body);add("\nendobj\n")};obj(1,"<< /Type /Catalog /Pages 2 0 R >>");obj(2,"<< /Type /Pages /Kids [3 0 R] /Count 1 >>");obj(3,"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>");obj(4,[`<< /Type /XObject /Subtype /Image /Width 1600 /Height 1100 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${bytes.length} >>\nstream\n`,bytes,"\nendstream"]);const stream="q 842 0 0 579 0 8 cm /Im0 Do Q";obj(5,`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);const xref=pos;add("xref\n0 6\n0000000000 65535 f \n");for(let i=1;i<=5;i++)add(`${String(offsets[i]).padStart(10,"0")} 00000 n \n`);add(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);const blob=new Blob(parts,{type:"application/pdf"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`臺灣登上國際舞臺-${name}.pdf`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 
-export default function Unit2(){const [saved,setSaved]=useState<Saved>(emptySaved),[ready,setReady]=useState(false),[answers,setAnswers]=useState<number[]>(Array(15).fill(-1)),[result,setResult]=useState<number|null>(null);useEffect(()=>{const t=setTimeout(()=>{try{const raw=localStorage.getItem(STORE);if(raw){const v={...emptySaved,...JSON.parse(raw)};setSaved(v);setAnswers(v.quizAnswers||Array(15).fill(-1))}}catch{localStorage.removeItem(STORE)}setReady(true)},0);return()=>clearTimeout(t)},[]);useEffect(()=>{if(ready)localStorage.setItem(STORE,JSON.stringify(saved))},[ready,saved]);const lessonDone=lessons.map(l=>l.challenges.every((_,i)=>saved.correct[`u2l${l.id}c${i}`])&&saved.correct[`u2l${l.id}s`]);const completed=Object.values(saved.correct).filter(Boolean).length,progress=Math.round(completed/8*100),eligible=lessonDone.every(Boolean)&&saved.quizBest>=80;const review=useMemo(()=>quiz.filter((_,i)=>answers[i]!==-1&&answers[i]!==quiz[i].answer).map(q=>q.concept).filter((v,i,a)=>a.indexOf(v)===i),[answers]);function submit(){if(answers.some(a=>a<0)){setResult(-1);return}const score=Math.round(answers.filter((a,i)=>a===quiz[i].answer).length/15*100);setResult(score);setSaved(s=>({...s,quizBest:Math.max(s.quizBest,score),quizAnswers:answers}))}
+export default function Unit2(){const [saved,setSaved]=useState<Saved>(emptySaved),[ready,setReady]=useState(false),[answers,setAnswers]=useState<number[]>(Array(15).fill(-1)),[result,setResult]=useState<number|null>(null);useEffect(()=>{const t=setTimeout(()=>{try{const raw=localStorage.getItem(STORE);if(raw){const stored=JSON.parse(raw);const changed=stored.answerVersion!==2;const v={...emptySaved,...stored,answerVersion:2,quizBest:changed?0:(stored.quizBest||0),quizAnswers:changed?Array(15).fill(-1):(stored.quizAnswers||Array(15).fill(-1))};setSaved(v);setAnswers(v.quizAnswers)}}catch{localStorage.removeItem(STORE)}setReady(true)},0);return()=>clearTimeout(t)},[]);useEffect(()=>{if(ready)localStorage.setItem(STORE,JSON.stringify(saved))},[ready,saved]);const lessonDone=lessons.map(l=>l.challenges.every((_,i)=>saved.correct[`u2l${l.id}c${i}`])&&saved.correct[`u2l${l.id}s`]);const completed=Object.values(saved.correct).filter(Boolean).length,progress=Math.round(completed/8*100),eligible=lessonDone.every(Boolean)&&saved.quizBest>=80;const review=useMemo(()=>quiz.filter((_,i)=>answers[i]!==-1&&answers[i]!==quiz[i].answer).map(q=>q.concept).filter((v,i,a)=>a.indexOf(v)===i),[answers]);function submit(){if(answers.some(a=>a<0)){setResult(-1);return}const score=Math.round(answers.filter((a,i)=>a===quiz[i].answer).length/15*100);setResult(score);setSaved(s=>({...s,quizBest:Math.max(s.quizBest,score),quizAnswers:answers}))}
   return <main className="unit2"><section className="hero hero-unit2" aria-labelledby="unit2-title"><nav className="topbar"><Link className="brand" href="/"><span className="brand-mark">島</span><span>臺灣時空探險隊</span></Link><div className="nav-links"><a href="#missions">任務</a><a href="#quiz">測驗</a><a href="#finish">證書</a></div><span className="progress-pill">探索進度 {progress}%</span></nav><div className="hero-grid" id="top"><div><p className="eyebrow">五年級社會・第二單元</p><h1 id="unit2-title">讓世界看見，<br/><em>航路上的臺灣。</em></h1><p className="lead">跟著船隊穿越 17 世紀，讀懂貿易、政權、文化交流與不同族群的命運。</p><a className="primary-button" href="#base">啟航探索 <span>→</span></a><p className="privacy-note">免登入即可學習・第二單元進度獨立保存在本機</p></div><div className="voyage-board" aria-label="第二單元重要年代"><p>航海任務星圖</p>{["1624 荷蘭來臺","1626 西班牙來臺","1642 荷蘭控制北部","1662 鄭氏政權","1684 納入清帝國"].map((x,i)=><div key={x}><span>{i+1}</span>{x}</div>)}</div></div><div className="wave"/></section>
   <section className="section base-section" id="base"><div className="section-heading"><div><p className="eyebrow dark">出發前・不計分</p><h2>航海準備室</h2></div><p>先確認位置、世紀與史料觀點。答錯會得到提示，不影響任務進度。</p></div><div className="warmups">{prerequisites.map((q,i)=><ChoiceTask key={q.prompt} item={q} taskKey={`u2p${i}`} saved={saved} setSaved={setSaved} unscored/>)}</div></section>
   <section className="mission-overview" id="missions"><div><p className="eyebrow">航海任務</p><h2>兩座調查站</h2><p>每站完成三題證據挑戰與一題生活決策，即可取得徽章。</p><Link className="next-unit-link" href="/">← 返回第一單元</Link></div><div className="badge-row unit2-badges">{lessons.map((l,i)=><a key={l.id} href={`#unit2-lesson-${l.id}`} className={lessonDone[i]?"badge won":"badge"}><span>{lessonDone[i]?"✓":l.icon}</span><b>{l.title}</b><small>{lessonDone[i]?"徽章已取得":"等待探索"}</small></a>)}</div></section>

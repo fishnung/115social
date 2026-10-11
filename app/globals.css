@@ -44,6 +44,8 @@ button { cursor: pointer; }
 .choice-task.is-complete { border-color: #71bca4; box-shadow: inset 5px 0 #0f766e, 0 12px 28px rgba(8,51,68,.06); }
 .task-heading { min-height: 22px; color: var(--teal); font-size: .74rem; font-weight: 950; letter-spacing: .08em; }
 .choice-task h4 { margin: 12px 0 18px; font-size: 1.1rem; line-height: 1.55; }
+.evidence-clue { display: grid; grid-template-columns: auto 1fr; gap: 10px; margin: -4px 0 16px; padding: 12px 14px; border-left: 4px solid #d39b32; border-radius: 0 10px 10px 0; color: #4d6267; background: #fff8dc; font-size: .86rem; line-height: 1.6; }
+.evidence-clue b { color: #8a5a0a; white-space: nowrap; }
 .choice-grid { display: grid; gap: 9px; }
 .choice-grid button { min-height: 48px; padding: 11px 14px; border: 1px solid #cbdcda; border-radius: 12px; color: #163f4b; background: #f8fcfb; text-align: left; font-weight: 700; }
 .choice-grid button:hover { border-color: var(--teal); background: #e8f7f3; }
