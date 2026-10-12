@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+const assetBase = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 type Choice = { prompt: string; options: string[]; answer: number; why: string; hint: string };
 type Lesson = {
   id: number; icon: string; kicker: string; title: string; question: string; color: string;
@@ -126,7 +128,7 @@ function InquiryTool({ lesson, onHint }: { lesson: Lesson; onHint: (cards:number
   const wrongItems=order.filter((itemIndex,index)=>itemIndex!==index);
   const hintCards=[...new Set(wrongItems.flatMap(itemIndex=>hintMap[itemIndex]))];
   const sequence=<div className="inquiry interactive-inquiry"><div className="tool-copy"><p className="eyebrow dark">動手探究・排列順序</p><h3>{lesson.tool.title}</h3><p>{lesson.tool.intro} 請直接拖曳卡片排列。</p></div><div className="sequence-tool"><ol>{order.map((itemIndex,index)=><li key={itemIndex} draggable onDragStart={()=>setDragged(index)} onDragOver={event=>event.preventDefault()} onDrop={()=>drop(index)}><span className="drag-grip" aria-hidden="true">⠿</span><b>{lesson.tool.items[itemIndex]}</b></li>)}</ol><button className="tool-check" onClick={()=>{setChecked(true);onHint(correct?null:hintCards)}}>檢查順序</button>{checked&&<div className={`tool-result ${correct?"correct":"retry"}`} role="status"><p>{correct?"✓ 排列正確！你已從工具、食物取得與聚落變化排出教材介紹順序。":"根據放錯的位置，相關知識卡已亮起。回去找出前因與後果，再重新排列。"}</p>{!correct&&<a href={`#unit1-${lesson.id}-card-${hintCards[0]}`}>查看發亮的知識卡 ↑</a>}</div>}</div></div>;
-  if(lesson.id===2)return <div className="inquiry-shell prehistoric-inquiry"><figure className="inquiry-evidence"><img src="/prehistoric-life-evidence.png" alt="四格圖呈現打製石器與用火、磨製石器與農業聚落、煉鐵與鐵製農具、航海交換器物等史前生活線索"/><figcaption><b>影像線索</b>比較每格的工具材質、食物取得、房屋聚落與交換方式；圖片不提供年代，請用看見的證據判斷。</figcaption></figure>{sequence}</div>;
+  if(lesson.id===2)return <div className="inquiry-shell prehistoric-inquiry"><figure className="inquiry-evidence"><img src={`${assetBase}/prehistoric-life-evidence.png`} alt="四格圖呈現打製石器與用火、磨製石器與農業聚落、煉鐵與鐵製農具、航海交換器物等史前生活線索"/><figcaption><b>影像線索</b>比較每格的工具材質、食物取得、房屋聚落與交換方式；圖片不提供年代，請用看見的證據判斷。</figcaption></figure>{sequence}</div>;
   return sequence;
 }
 
@@ -160,7 +162,7 @@ export default function Home() {
 
     <section className="section base-section" id="base"><div className="section-heading"><div><p className="eyebrow dark">出發前・不計分</p><h2>先備基地</h2></div><p>先確認方向、地圖和時間感。答錯沒關係，提示會帶你找到線索。</p></div><div className="warmups">{prerequisites.map((q,i)=><ChoiceTask key={q.prompt} item={q} taskKey={`p${i}`} saved={saved} setSaved={setSaved} unscored/>)}</div></section>
 
-    <section className="mission-overview" id="missions"><div><p className="eyebrow">探索地圖</p><h2>三座任務站</h2><p>每站完成三項證據挑戰與一題生活決策，就能獲得一枚徽章。</p><a className="next-unit-link" href="/unit2">接續第二單元：臺灣登上國際舞臺 →</a></div><div className="badge-row">{lessons.map((l,i)=><a key={l.id} href={`#lesson-${l.id}`} className={lessonDone[i]?"badge won":"badge"}><span>{lessonDone[i]?"✓":l.icon}</span><b>{l.title}</b><small>{lessonDone[i]?"徽章已取得":"等待探索"}</small></a>)}</div></section>
+    <section className="mission-overview" id="missions"><div><p className="eyebrow">探索地圖</p><h2>三座任務站</h2><p>每站完成三項證據挑戰與一題生活決策，就能獲得一枚徽章。</p><Link className="next-unit-link" href="/unit2">接續第二單元：臺灣登上國際舞臺 →</Link></div><div className="badge-row">{lessons.map((l,i)=><a key={l.id} href={`#lesson-${l.id}`} className={lessonDone[i]?"badge won":"badge"}><span>{lessonDone[i]?"✓":l.icon}</span><b>{l.title}</b><small>{lessonDone[i]?"徽章已取得":"等待探索"}</small></a>)}</div></section>
 
     {lessons.map((lesson,li)=><section className={`lesson lesson-${lesson.color}`} id={`lesson-${lesson.id}`} key={lesson.id}><div className="section lesson-inner"><header className="lesson-header"><div className="lesson-number">0{lesson.id}</div><div><p className="eyebrow dark">{lesson.kicker}</p><h2>{lesson.title}</h2><p>{lesson.question}</p></div><div className={`big-badge ${lessonDone[li]?"won":""}`}>{lessonDone[li]?"✓":lesson.icon}<small>{lessonDone[li]?"完成":"進行中"}</small></div></header>
       <div className="concept-strip">{lesson.concepts.map(c=><span key={c}>{c}</span>)}</div><div className="cards">{lesson.cards.map((c,i)=>{const cardKey=`${lesson.id}-${i}`;return <article id={`unit1-${lesson.id}-card-${i}`} tabIndex={-1} className={`knowledge-card ${highlightedCards.includes(cardKey)?"is-hint":""}`} key={c.title}><span className="card-count">0{i+1}</span><p className="card-tag">{c.tag}</p><h3>{c.title}</h3><p>{c.text}</p><p className="card-bridge"><b>思考提示｜想一想為什麼？</b>{lesson.question}</p></article>})}</div>
