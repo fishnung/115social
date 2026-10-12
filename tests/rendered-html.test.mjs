@@ -70,7 +70,11 @@ test("第二單元包含兩課、探究任務、測驗與證書", async () => {
   assert.match(page, /先問「這項證據在說誰？」/);
   assert.match(page, /已分類/);
   assert.match(page, /item-correct/);
-  assert.match(page, /每張卡下方都有判斷理由/);
+  assert.match(page, /對照上方圖像與每張卡下方的理由再試一次/);
+  assert.match(page, /east-asia-route-evidence\.png/);
+  assert.match(page, /cultural-traces-evidence\.png/);
+  assert.match(page, /影像線索/);
+  assert.match(page, /中國、日本與東南亞間的轉運貿易/);
   assert.match(page, /answerVersion: 2/);
   const quizSource = page.slice(page.indexOf("const quiz"), page.indexOf("function ChoiceTask"));
   const answers = [...quizSource.matchAll(/answer: ([012])/g)].map((match) => Number(match[1]));
