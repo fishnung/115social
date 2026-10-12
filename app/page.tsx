@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 type Choice = { prompt: string; options: string[]; answer: number; why: string; hint: string };
@@ -109,6 +110,16 @@ function ChoiceTask({ item, taskKey, saved, setSaved, unscored = false }: { item
   </div>;
 }
 
+function InquiryTool({ lesson }: { lesson: Lesson }) {
+  const [order,setOrder]=useState([2,0,3,1]);
+  const [dragged,setDragged]=useState<number|null>(null);
+  const [checked,setChecked]=useState(false);
+  function move(from:number,to:number){if(to<0||to>=order.length)return;setOrder(items=>{const next=[...items];const [item]=next.splice(from,1);next.splice(to,0,item);return next});setChecked(false);}
+  function drop(to:number){if(dragged===null)return;move(dragged,to);setDragged(null);}
+  const correct=order.every((value,index)=>value===index);
+  return <div className="inquiry interactive-inquiry"><div className="tool-copy"><p className="eyebrow dark">動手探究・排列順序</p><h3>{lesson.tool.title}</h3><p>{lesson.tool.intro} 請直接拖曳卡片排列。</p></div><div className="sequence-tool"><ol>{order.map((itemIndex,index)=><li key={itemIndex} draggable onDragStart={()=>setDragged(index)} onDragOver={event=>event.preventDefault()} onDrop={()=>drop(index)}><span className="drag-grip" aria-hidden="true">⠿</span><b>{lesson.tool.items[itemIndex]}</b></li>)}</ol><button className="tool-check" onClick={()=>setChecked(true)}>檢查順序</button>{checked&&<p className={`tool-result ${correct?"correct":"retry"}`} role="status">{correct?"✓ 排列正確！你已把線索接成完整關係。":"還有順序需要調整，回到知識卡找前因與後果。"}</p>}</div></div>;
+}
+
 function makeCertificate(name: string, score: number) {
   const canvas = document.createElement("canvas"); canvas.width = 1600; canvas.height = 1100;
   const c = canvas.getContext("2d")!; c.fillStyle = "#fffaf0"; c.fillRect(0, 0, 1600, 1100);
@@ -132,8 +143,8 @@ export default function Home() {
   const completed = Object.values(saved.correct).filter(Boolean).length; const progress = Math.round(completed / 12 * 100); const eligible = lessonDone.every(Boolean) && saved.quizBest >= 80;
   const review = useMemo(() => quiz.filter((_,i)=>quizAnswers[i]!==-1 && quizAnswers[i]!==quiz[i].answer).map(q=>q.concept).filter((v,i,a)=>a.indexOf(v)===i), [quizAnswers]);
   function submitQuiz(){if(quizAnswers.some(a=>a<0)){setQuizResult(-1);return;}const score=Math.round(quizAnswers.filter((a,i)=>a===quiz[i].answer).length/15*100);setQuizResult(score);setSaved(s=>({...s,quizBest:Math.max(s.quizBest,score),quizAnswers}));}
-  return <main>
-    <section className="hero" aria-labelledby="hero-title"><nav className="topbar" aria-label="主要導覽"><a className="brand" href="#top"><span className="brand-mark" aria-hidden="true">島</span><span>臺灣時空探險隊</span></a><div className="nav-links"><a href="#missions">任務地圖</a><a href="#quiz">單元測驗</a><a href="#finish">結業站</a></div><span className="progress-pill">探索進度 {progress}%</span></nav>
+  return <main className="unit1">
+    <section className="hero" aria-labelledby="hero-title"><nav className="topbar" aria-label="主要導覽"><Link className="brand" href="/courses"><span className="brand-mark" aria-hidden="true">島</span><span>臺灣時空探險隊</span></Link><div className="nav-links"><Link href="/courses">課程入口</Link><a href="#missions">任務地圖</a><a href="#quiz">單元測驗</a><a href="#finish">結業站</a></div><span className="progress-pill">探索進度 {progress}%</span></nav>
       <div className="hero-grid" id="top"><div className="hero-copy"><p className="eyebrow">五年級社會・第一單元</p><h1 id="hero-title">讀懂一座島，<br/><em>找到我們的足跡。</em></h1><p className="lead">從海洋位置、地下遺物到山林智慧，蒐集三枚證據徽章，完成守護臺灣的時空任務。</p><a className="primary-button" href="#base">開始探險 <span aria-hidden="true">→</span></a><p className="privacy-note">免登入即可學習・進度只保存在這個裝置</p></div>
         <figure className="hero-art"><Image src="/og.png" alt="臺灣時空探險隊主視覺：臺灣島結合海洋、考古地層、山林、陶片與玉器，主題為位置、足跡與共生智慧" width={1733} height={909} priority/><figcaption>從海洋到山林，沿著證據讀懂臺灣。</figcaption></figure></div><div className="wave" aria-hidden="true"/></section>
 
@@ -142,15 +153,15 @@ export default function Home() {
     <section className="mission-overview" id="missions"><div><p className="eyebrow">探索地圖</p><h2>三座任務站</h2><p>每站完成三項證據挑戰與一題生活決策，就能獲得一枚徽章。</p><a className="next-unit-link" href="/unit2">接續第二單元：臺灣登上國際舞臺 →</a></div><div className="badge-row">{lessons.map((l,i)=><a key={l.id} href={`#lesson-${l.id}`} className={lessonDone[i]?"badge won":"badge"}><span>{lessonDone[i]?"✓":l.icon}</span><b>{l.title}</b><small>{lessonDone[i]?"徽章已取得":"等待探索"}</small></a>)}</div></section>
 
     {lessons.map((lesson,li)=><section className={`lesson lesson-${lesson.color}`} id={`lesson-${lesson.id}`} key={lesson.id}><div className="section lesson-inner"><header className="lesson-header"><div className="lesson-number">0{lesson.id}</div><div><p className="eyebrow dark">{lesson.kicker}</p><h2>{lesson.title}</h2><p>{lesson.question}</p></div><div className={`big-badge ${lessonDone[li]?"won":""}`}>{lessonDone[li]?"✓":lesson.icon}<small>{lessonDone[li]?"完成":"進行中"}</small></div></header>
-      <div className="concept-strip">{lesson.concepts.map(c=><span key={c}>{c}</span>)}</div><div className="cards">{lesson.cards.map((c,i)=><article className="knowledge-card" key={c.title}><span className="card-count">0{i+1}</span><p className="card-tag">{c.tag}</p><h3>{c.title}</h3><p>{c.text}</p></article>)}</div>
-      <div className="inquiry"><div className="tool-copy"><p className="eyebrow dark">探究工具</p><h3>{lesson.tool.title}</h3><p>{lesson.tool.intro}</p></div><ol>{lesson.tool.items.map((x,i)=><li key={x}><span>{i+1}</span>{x}</li>)}</ol></div>
+      <div className="concept-strip">{lesson.concepts.map(c=><span key={c}>{c}</span>)}</div><div className="cards">{lesson.cards.map((c,i)=><article className="knowledge-card" key={c.title}><span className="card-count">0{i+1}</span><p className="card-tag">{c.tag}</p><h3>{c.title}</h3><p>{c.text}</p><p className="card-bridge"><b>思考提示｜想一想為什麼？</b>{lesson.question}</p></article>)}</div>
+      <InquiryTool lesson={lesson}/>
       <div className="challenge-zone"><div className="zone-heading"><p className="eyebrow dark">證據挑戰</p><h3>用剛才的線索完成 3 關</h3></div>{lesson.challenges.map((q,i)=><ChoiceTask key={q.prompt} item={q} taskKey={`l${lesson.id}c${i}`} saved={saved} setSaved={setSaved}/>)}</div>
       <div className="scenario"><div className="scenario-label">生活決策室</div><ChoiceTask item={lesson.scenario} taskKey={`l${lesson.id}s`} saved={saved} setSaved={setSaved}/></div>
     </div></section>)}
 
     <section className="section quiz-section" id="quiz"><div className="section-heading"><div><p className="eyebrow dark">最後檢核・可不限次重試</p><h2>15 題單元測驗</h2></div><div className="score-orb"><span>{saved.quizBest}</span><small>最高分</small></div></div><p className="quiz-note">三課平均出題。請完成全部題目再送出，送出後會看到解析與複習方向。</p><div className="quiz-list">{quiz.map((q,i)=><fieldset key={q.prompt}><legend><span>{String(i+1).padStart(2,"0")}</span>{q.prompt}</legend>{q.options.map((o,j)=><label key={o} className={quizAnswers[i]===j?"selected":""}><input type="radio" name={`q${i}`} checked={quizAnswers[i]===j} onChange={()=>setQuizAnswers(a=>a.map((v,k)=>k===i?j:v))}/>{o}</label>)}{quizResult!==null&&quizResult>=0&&<p className={quizAnswers[i]===q.answer?"explain correct":"explain incorrect"}>{quizAnswers[i]===q.answer?"✓":"→"} {q.why}</p>}</fieldset>)}</div><button className="submit-button" onClick={submitQuiz}>送出 15 題答案</button>{quizResult===-1&&<p className="feedback try" role="alert">還有題目沒完成，請檢查每一題。</p>}{quizResult!==null&&quizResult>=0&&<div className={`result-panel ${quizResult>=80?"pass":"review"}`} role="status"><span className="result-score">{quizResult}</span><div><h3>{quizResult>=80?"通過挑戰！":"再複習一次就更穩了"}</h3><p>{quizResult>=80?"已達 80 分門檻。確認三課任務完成後，即可領取證書。":`建議複習：${review.join("、") || "錯題解析"}。你可以回到任務站，再重新挑戰。`}</p></div></div>}</section>
 
-    <section className="finish" id="finish"><div className="section finish-grid"><div><p className="eyebrow">結業站</p><h2>{eligible?"證據齊全，準備領證！":"最後一步，正在等你。"}</h2><p className="finish-lead">{eligible?"你已完成所有任務與情境題，也通過單元測驗。輸入姓名，下載只屬於你的橫式 PDF 證書。":"完成三枚任務徽章，並讓測驗最高分達到 80 分，就能解鎖證書。"}</p><div className="checklist">{lessonDone.map((done,i)=><p key={i} className={done?"done":""}><span>{done?"✓":"○"}</span>{lessons[i].title}：任務與生活決策</p>)}<p className={saved.quizBest>=80?"done":""}><span>{saved.quizBest>=80?"✓":"○"}</span>單元測驗最高分達 80 分</p></div></div>
+    <section className="finish" id="finish"><div className="section finish-grid"><div><p className="eyebrow">結業站</p><h2>{eligible?"證據齊全，準備領證！":"最後一步，正在等你。"}</h2><p className="finish-lead">{eligible?"你已完成所有任務與情境題，也通過單元測驗。輸入姓名，下載只屬於你的 PNG 圖片證書。":"完成三枚任務徽章，並讓測驗最高分達到 80 分，就能解鎖證書。"}</p><div className="checklist">{lessonDone.map((done,i)=><p key={i} className={done?"done":""}><span>{done?"✓":"○"}</span>{lessons[i].title}：任務與生活決策</p>)}<p className={saved.quizBest>=80?"done":""}><span>{saved.quizBest>=80?"✓":"○"}</span>單元測驗最高分達 80 分</p></div></div>
       <div className="certificate-card"><div className="cert-mark">探險隊</div><p>學習回饋</p><h3>{saved.name||"你的名字"}</h3><p>{completed===12?"你能運用位置、證據與永續觀點理解臺灣。":`已完成 ${completed}／12 項任務，下一步前往尚未取得的徽章。`}</p><label>證書姓名<input value={saved.name} maxLength={20} placeholder="請輸入真實姓名" onChange={e=>setSaved(s=>({...s,name:e.target.value}))}/></label><button disabled={!eligible||!saved.name.trim()} onClick={()=>makeCertificate(saved.name.trim(),saved.quizBest)}>下載 PNG 圖片證書</button><small>姓名僅用於本機產生證書，不會上傳。</small></div></div></section>
     <footer><a className="brand" href="#top"><span className="brand-mark">島</span><span>臺灣時空探險隊</span></a><p>依據教材概念重新設計，未重製課本頁面與插圖。</p><button onClick={()=>{if(confirm("確定要清除這個裝置上的學習進度嗎？")){localStorage.removeItem(STORE);location.reload();}}}>清除本機進度</button></footer>
   </main>;

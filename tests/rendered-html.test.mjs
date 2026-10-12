@@ -40,8 +40,24 @@ test("課程結構包含必要任務、測驗與證書", async () => {
   assert.match(page, /下載 PNG 圖片證書/);
   assert.doesNotMatch(page, /application\/pdf/);
   assert.match(page, /localStorage/);
+  assert.match(page, /function InquiryTool/);
+  assert.match(page, /draggable/);
+  assert.match(page, /思考提示｜想一想為什麼？/);
+  assert.match(page, /className="unit1"/);
   assert.match(css, /prefers-reduced-motion/);
   assert.match(css, /focus-visible/);
+  assert.match(css, /\.unit1 \.challenge-zone/);
+});
+
+test("雙單元課程入口可回應並連到兩個單元", async () => {
+  const response = await renderPath("/courses");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /自主學習入口/);
+  assert.match(html, /臺灣的位置與先民足跡/);
+  assert.match(html, /臺灣登上國際舞臺/);
+  assert.match(html, /href="\/"/);
+  assert.match(html, /href="\/unit2"/);
 });
 
 test("第二單元包含兩課、探究任務、測驗與證書", async () => {
