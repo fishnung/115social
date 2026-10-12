@@ -67,13 +67,16 @@ test("第二單元包含兩課、探究任務、測驗與證書", async () => {
   assert.match(page, /draggable/);
   assert.match(page, /動手探究・證據分類/);
   assert.match(page, /classifyItems/);
-  assert.match(page, /先問「這項證據在說誰？」/);
+  assert.match(page, /WORD BANK｜待分類證據/);
+  assert.match(page, /category-bins/);
+  assert.match(page, /放入這欄/);
   assert.match(page, /已分類/);
   assert.match(page, /item-correct/);
-  assert.match(page, /對照上方圖像與每張卡下方的理由再試一次/);
+  assert.match(page, /紅色證據需要換欄/);
   assert.match(page, /east-asia-route-evidence\.png/);
   assert.match(page, /cultural-traces-evidence\.png/);
   assert.match(page, /影像線索/);
+  assert.match(page, /思考提示｜想一想為什麼？/);
   assert.match(page, /中國、日本與東南亞間的轉運貿易/);
   assert.match(page, /answerVersion: 2/);
   const quizSource = page.slice(page.indexOf("const quiz"), page.indexOf("function ChoiceTask"));
