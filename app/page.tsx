@@ -28,7 +28,7 @@ const lessons: Lesson[] = [
       { tag: "氣候", title: "兩種季風的訊息", text: "冬季東北季風使北部、東北部溼冷多雨；夏季西南季風帶來溫暖潮溼氣流，使全臺溼熱多雨。" },
       { tag: "遷徙", title: "跟著海流與季節", text: "冬季烏魚隨寒流南下，春夏黑鮪魚隨暖流北上；黑面琵鷺則在天氣轉冷時來臺度冬。" },
     ],
-    tool: { title: "羅盤探究：從位置找影響", intro: "把線索依序連起來：位置不是地圖上的一個點，它會帶來一連串影響。", items: ["亞洲東側、太平洋西側", "海運交流方便", "文化與產業發展", "寒暖流交會、生物豐富"] },
+    tool: { title: "位置影響鏈：找出兩條關聯", intro: "從知識卡的原句出發，分別排出『人群交流』與『生態移動』的原因、條件和結果。", items: ["位在東亞海域交通中途", "船隻往來與停靠方便", "貨物、人群與文化交流增加", "四面環海、寒暖流經過", "不同水溫與餌料隨季節變化", "魚群洄游、候鳥停棲，生物更多樣"] },
     challenges: [
       { prompt: "從高雄港前往新加坡，最可能先航向哪個區域？", options: ["臺灣海峽與南海", "大西洋", "北冰洋"], answer: 0, why: "高雄在臺灣西南側，往新加坡會經臺灣海峽南部與南海。", hint: "找臺灣西南方與東南亞之間的海域。" },
       { prompt: "新竹居民利用冬季強風和日晒製作柿餅，主要適應哪種季風？", options: ["東北季風", "西南季風", "沒有季風"], answer: 0, why: "新竹冬季受東北季風影響，強風有助柿子乾燥保存。", hint: "關鍵詞是「冬季」和「強風」。" },
@@ -111,12 +111,17 @@ function ChoiceTask({ item, taskKey, saved, setSaved, unscored = false }: { item
 }
 
 function InquiryTool({ lesson }: { lesson: Lesson }) {
+  const [locationOrders,setLocationOrders]=useState([[2,0,1],[1,2,0]]);
+  const [locationDrag,setLocationDrag]=useState<{chain:number;index:number}|null>(null);
+  const [locationChecked,setLocationChecked]=useState(false);
   const [order,setOrder]=useState([2,0,3,1]);
   const [dragged,setDragged]=useState<number|null>(null);
   const [checked,setChecked]=useState(false);
   function move(from:number,to:number){if(to<0||to>=order.length)return;setOrder(items=>{const next=[...items];const [item]=next.splice(from,1);next.splice(to,0,item);return next});setChecked(false);}
   function drop(to:number){if(dragged===null)return;move(dragged,to);setDragged(null);}
   const correct=order.every((value,index)=>value===index);
+  function dropLocation(chain:number,to:number){if(!locationDrag||locationDrag.chain!==chain)return;setLocationOrders(current=>current.map((items,index)=>{if(index!==chain)return items;const next=[...items];const [item]=next.splice(locationDrag.index,1);next.splice(to,0,item);return next}));setLocationDrag(null);setLocationChecked(false);}
+  if(lesson.id===1){const locationCorrect=locationOrders.every(items=>items.every((value,index)=>value===index));return <div className="inquiry location-inquiry"><div className="location-intro"><p className="eyebrow dark">動手探究・位置影響鏈</p><h3>{lesson.tool.title}</h3><p>{lesson.tool.intro}</p><div className="source-clues" aria-label="知識卡線索"><p><b>知識卡 1 線索</b>「四面環海的位置有利航運、交流與貿易。」</p><p><b>知識卡 3 線索</b>「烏魚隨寒流南下、黑鮪魚隨暖流北上，候鳥來臺度冬。」</p></div></div><div className="impact-chains">{["人群交流線","生態移動線"].map((label,chain)=><section className="impact-chain" key={label}><h4>{label}</h4><div className="chain-role-labels" aria-hidden="true"><span>位置原因</span><span>直接條件</span><span>生活／生態結果</span></div><ol>{locationOrders[chain].map((itemIndex,index)=><li key={itemIndex} draggable onDragStart={()=>setLocationDrag({chain,index})} onDragOver={event=>event.preventDefault()} onDrop={()=>dropLocation(chain,index)}><span className="drag-grip" aria-hidden="true">⠿</span><b>{lesson.tool.items[chain*3+itemIndex]}</b>{index<2&&<i aria-hidden="true">→</i>}</li>)}</ol></section>)}</div><button className="tool-check" onClick={()=>setLocationChecked(true)}>檢查兩條影響鏈</button>{locationChecked&&<p className={`tool-result ${locationCorrect?"correct":"retry"}`} role="status">{locationCorrect?"✓ 連結正確！位置會先形成交通或自然條件，再影響人群交流與生物移動。":"再看上方兩張知識卡：先找位置，再找它造成的條件，最後才是生活或生態結果。"}</p>}</div>}
   return <div className="inquiry interactive-inquiry"><div className="tool-copy"><p className="eyebrow dark">動手探究・排列順序</p><h3>{lesson.tool.title}</h3><p>{lesson.tool.intro} 請直接拖曳卡片排列。</p></div><div className="sequence-tool"><ol>{order.map((itemIndex,index)=><li key={itemIndex} draggable onDragStart={()=>setDragged(index)} onDragOver={event=>event.preventDefault()} onDrop={()=>drop(index)}><span className="drag-grip" aria-hidden="true">⠿</span><b>{lesson.tool.items[itemIndex]}</b></li>)}</ol><button className="tool-check" onClick={()=>setChecked(true)}>檢查順序</button>{checked&&<p className={`tool-result ${correct?"correct":"retry"}`} role="status">{correct?"✓ 排列正確！你已把線索接成完整關係。":"還有順序需要調整，回到知識卡找前因與後果。"}</p>}</div></div>;
 }
 

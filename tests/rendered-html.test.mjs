@@ -42,6 +42,10 @@ test("課程結構包含必要任務、測驗與證書", async () => {
   assert.match(page, /localStorage/);
   assert.match(page, /function InquiryTool/);
   assert.match(page, /draggable/);
+  assert.match(page, /位置影響鏈：找出兩條關聯/);
+  assert.match(page, /知識卡 1 線索/);
+  assert.match(page, /人群交流線/);
+  assert.match(page, /生態移動線/);
   assert.match(page, /思考提示｜想一想為什麼？/);
   assert.match(page, /className="unit1"/);
   assert.match(css, /prefers-reduced-motion/);
