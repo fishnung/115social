@@ -124,6 +124,8 @@ button { cursor: pointer; }
 .tool-check { width: 100%; margin-top: 14px; padding: 13px; border: 0; border-radius: 11px; color: var(--deep); background: var(--sun); font-weight: 950; }
 .tool-check:disabled { opacity: .45; cursor: not-allowed; }
 .tool-result { margin: 12px 0 0; padding: 12px; border-radius: 10px; line-height: 1.55; }
+.tool-result p { margin: 0; }
+.tool-result a { display: inline-block; margin-top: 8px; color: inherit; font-weight: 950; text-underline-offset: 4px; }
 .tool-result.correct { color: #073f38; background: #a7f3d0; }.tool-result.retry { color: #742f26; background: #fee2e2; }
 .classify-inquiry { display: block; }
 .classify-intro { margin-bottom: 18px; }

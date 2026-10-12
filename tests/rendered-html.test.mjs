@@ -48,6 +48,9 @@ test("課程結構包含必要任務、測驗與證書", async () => {
   assert.match(page, /生態移動線/);
   assert.match(page, /prehistoric-life-evidence\.png/);
   assert.match(page, /看圖探究：生活方式如何改變/);
+  assert.match(page, /根據放錯的位置，相關知識卡已亮起/);
+  assert.match(page, /highlightedCards\.includes\(cardKey\)\?"is-hint"/);
+  assert.match(page, /查看發亮的知識卡/);
   assert.doesNotMatch(page, /距今約 5 萬年前：打製石器/);
   assert.doesNotMatch(page, /約 7,000 年前：磨製石器/);
   assert.doesNotMatch(page, /約 2,500 年前：煉鐵/);
