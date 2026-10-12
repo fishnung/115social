@@ -6,8 +6,8 @@
 
 [https://fishnung.github.io/115social/](https://fishnung.github.io/115social/)
 
-- 課程入口：`/courses/`
-- 第一單元：網站首頁
+- 課程入口：網站首頁（`/courses/` 也可使用）
+- 第一單元：`/unit1/`
 - 第二單元：`/unit2/`
 - 六年級：預留入口，課程尚未開始製作
 

@@ -4,7 +4,7 @@ const repoBase = "/115social";
 
 function pageHref(href: string) {
   if (!href.startsWith("/") || href.startsWith(repoBase)) return href;
-  return href === "/" ? `${repoBase}/` : `${repoBase}${href}/`;
+  return href === "/" ? `${repoBase}/unit1/` : `${repoBase}${href}/`;
 }
 
 export default function Link({

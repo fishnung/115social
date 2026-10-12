@@ -9,9 +9,9 @@ const repoBase = "/115social";
 const pathname = window.location.pathname.replace(repoBase, "").replace(/\/$/, "") || "/";
 const Page = pathname.startsWith("/unit2")
   ? Unit2
-  : pathname.startsWith("/courses")
-    ? Courses
-    : Home;
+  : pathname.startsWith("/unit1")
+    ? Home
+    : Courses;
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
