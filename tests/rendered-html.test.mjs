@@ -46,6 +46,11 @@ test("課程結構包含必要任務、測驗與證書", async () => {
   assert.match(page, /知識卡 1 線索/);
   assert.match(page, /人群交流線/);
   assert.match(page, /生態移動線/);
+  assert.match(page, /prehistoric-life-evidence\.png/);
+  assert.match(page, /看圖探究：生活方式如何改變/);
+  assert.doesNotMatch(page, /距今約 5 萬年前：打製石器/);
+  assert.doesNotMatch(page, /約 7,000 年前：磨製石器/);
+  assert.doesNotMatch(page, /約 2,500 年前：煉鐵/);
   assert.match(page, /思考提示｜想一想為什麼？/);
   assert.match(page, /className="unit1"/);
   assert.match(css, /prefers-reduced-motion/);
@@ -60,6 +65,8 @@ test("雙單元課程入口可回應並連到兩個單元", async () => {
   assert.match(html, /自主學習入口/);
   assert.match(html, /臺灣的位置與先民足跡/);
   assert.match(html, /臺灣登上國際舞臺/);
+  assert.match(html, /五年級/);
+  assert.match(html, /六年級課程準備中/);
   assert.match(html, /href="\/"/);
   assert.match(html, /href="\/unit2"/);
 });
