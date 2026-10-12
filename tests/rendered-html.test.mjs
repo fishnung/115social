@@ -36,7 +36,9 @@ test("課程結構包含必要任務、測驗與證書", async () => {
   assert.match(page, /山海共生議會/);
   assert.equal((page.match(/concept: "/g) ?? []).length, 15);
   assert.match(page, /quizBest >= 80/);
-  assert.match(page, /application\/pdf/);
+  assert.match(page, /image\/png/);
+  assert.match(page, /下載 PNG 圖片證書/);
+  assert.doesNotMatch(page, /application\/pdf/);
   assert.match(page, /localStorage/);
   assert.match(css, /prefers-reduced-motion/);
   assert.match(css, /focus-visible/);
@@ -50,10 +52,12 @@ test("第二單元包含兩課、探究任務、測驗與證書", async () => {
   assert.match(html, /東亞航海指揮所/);
   assert.match(html, /歷史足跡調查局/);
   const page = await readFile(new URL("../app/unit2/page.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.equal((page.match(/concept: "/g) ?? []).length, 15);
   assert.match(page, /大肚王國/);
   assert.match(page, /quizBest>=80/);
-  assert.match(page, /application\/pdf/);
+  assert.match(page, /image\/png/);
+  assert.doesNotMatch(page, /application\/pdf/);
   assert.match(page, /localStorage/);
   assert.match(page, /證據線索/);
   assert.match(page, /picked!==null&&!right&&item\.evidence/);
@@ -77,6 +81,8 @@ test("第二單元包含兩課、探究任務、測驗與證書", async () => {
   assert.match(page, /cultural-traces-evidence\.png/);
   assert.match(page, /影像線索/);
   assert.match(page, /思考提示｜想一想為什麼？/);
+  assert.match(css, /\.unit2 \.card-bridge b::after/);
+  assert.match(css, /\.keyboard-note \{ display: none; \}/);
   assert.match(page, /中國、日本與東南亞間的轉運貿易/);
   assert.match(page, /answerVersion: 2/);
   const quizSource = page.slice(page.indexOf("const quiz"), page.indexOf("function ChoiceTask"));
