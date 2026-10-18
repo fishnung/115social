@@ -209,6 +209,14 @@ footer { padding: 36px max(20px, calc((100% - 1120px)/2)); display: flex; align-
 .grade6-unit2 .impact-chain li.selected { outline: 4px solid var(--sun); outline-offset: 2px; }
 .grade6-unit2 .impact-chain h4 { font-size: 1rem; }
 .grade6-unit2 .impact-chain li b { font-size: .78rem; }
+.grade6-unit2 .guide-toggle { width: 100%; margin-top: 10px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #9fcac2; border-radius: 10px; color: #0b665e; background: #f8fffd; font: inherit; font-size: .78rem; font-weight: 900; text-align: left; cursor: pointer; }
+.grade6-unit2 .guide-toggle:hover { border-color: var(--teal); background: #e9f8f3; }
+.grade6-unit2 .guide-toggle:focus-visible { outline: 4px solid var(--sun); outline-offset: 2px; }
+.grade6-unit2 .guide-toggle span { width: 24px; height: 24px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 50%; color: white; background: var(--teal); font-size: 1rem; }
+.grade6-unit2 .card-guide { margin-top: 9px; padding: 13px 14px; border-left: 4px solid var(--sun); border-radius: 10px; color: #294b53; background: #fff8dc; font-size: .78rem; line-height: 1.6; }
+.grade6-unit2 .card-guide > b { display: block; color: #7b5810; }
+.grade6-unit2 .card-guide p { margin: 4px 0; }
+.grade6-unit2 .card-guide small { color: #6e6753; }
 .grade6-unit1 .knowledge-card { min-height: 410px; display: flex; flex-direction: column; }
 .grade6-unit1 .knowledge-card .card-body { position: relative; margin: 0; color: #4f6970; line-height: 1.82; }
 .grade6-unit1 .knowledge-card .card-bridge { margin: auto 0 0; padding: 14px; border-radius: 12px; color: #35535b; background: #edf7f5; font-size: .82rem; line-height: 1.6; }
