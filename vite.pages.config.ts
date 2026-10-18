@@ -26,7 +26,7 @@ export default defineConfig({
       name: "github-pages-route-copies",
       closeBundle() {
         const source = path.join(outputDir, "index.html");
-        for (const route of ["courses", "unit1", "unit2", "grade6/unit1"]) {
+        for (const route of ["courses", "unit1", "unit2", "grade6/unit1", "grade6/unit2"]) {
           const routeDir = path.join(outputDir, route);
           mkdirSync(routeDir, { recursive: true });
           copyFileSync(source, path.join(routeDir, "index.html"));
