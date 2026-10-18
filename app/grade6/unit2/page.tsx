@@ -68,21 +68,21 @@ const quiz:(Choice&{concept:string})[] = [
 ];
 
 const policyItems = [
-  { text:"降低佃農租金，讓實際耕作者取得土地", answer:"土地改革", why:"減輕農民負擔並穩定農村生活。" },
-  { text:"部分地主取得補償後轉投工商業", answer:"土地改革", why:"土地資源調整也間接促進工商活動。" },
-  { text:"提供麵粉奶粉，改善物資短缺", answer:"美國援助", why:"援助先回應戰後民生急需。" },
-  { text:"以貸款技術支援水庫與橋梁", answer:"美國援助", why:"基礎建設為生產和流通打底。" },
-  { text:"靠近港口進口原料、組裝後外銷", answer:"加工出口", why:"海運連結原料輸入與產品出口。" },
-  { text:"吸引農村青年與女性進入工廠", answer:"加工出口", why:"工作機會帶動人口與家庭角色改變。" },
+  { text:"降低佃農租金，讓實際耕作者取得土地", answer:"土地改革", why:"減輕農民負擔並穩定農村生活。", card:0 },
+  { text:"部分地主取得補償後轉投工商業", answer:"土地改革", why:"土地資源調整也間接促進工商活動。", card:0 },
+  { text:"提供麵粉奶粉，改善物資短缺", answer:"美國援助", why:"援助先回應戰後民生急需。", card:1 },
+  { text:"以貸款技術支援水庫與橋梁", answer:"美國援助", why:"基礎建設為生產和流通打底。", card:1 },
+  { text:"靠近港口進口原料、組裝後外銷", answer:"加工出口", why:"海運連結原料輸入與產品出口。", card:2 },
+  { text:"吸引農村青年與女性進入工廠", answer:"加工出口", why:"工作機會帶動人口與家庭角色改變。", card:2 },
 ];
 
 const parkItems = [
-  { text:"創造高科技工作與研發機會", answer:"發展機會", why:"產業聚落帶來就業、技術與投資。" },
-  { text:"帶動醫療、商業與教育服務", answer:"發展機會", why:"人口與企業聚集會增加公共服務需求。" },
-  { text:"促進大學、研究機構與企業合作", answer:"發展機會", why:"知識與技術交流提升創新能力。" },
-  { text:"增加土地、水資源與電力需求", answer:"需要配套", why:"資源使用必須評估承載能力。" },
-  { text:"房價租金上升、居民負擔增加", answer:"需要配套", why:"人口快速移入可能推高居住成本。" },
-  { text:"車流增加，使通勤時間變長", answer:"需要配套", why:"園區成長需要同步規畫大眾運輸。" },
+  { text:"創造高科技工作與研發機會", answer:"發展機會", why:"產業聚落帶來就業、技術與投資。", card:0 },
+  { text:"帶動醫療、商業與教育服務", answer:"發展機會", why:"人口與企業聚集會增加公共服務需求。", card:0 },
+  { text:"促進大學、研究機構與企業合作", answer:"發展機會", why:"知識與技術交流提升創新能力。", card:0 },
+  { text:"增加土地、水資源與電力需求", answer:"需要配套", why:"資源使用必須評估承載能力。", card:2 },
+  { text:"房價租金上升、居民負擔增加", answer:"需要配套", why:"人口快速移入可能推高居住成本。", card:2 },
+  { text:"車流增加，使通勤時間變長", answer:"需要配套", why:"園區成長需要同步規畫大眾運輸。", card:2 },
 ];
 
 const chainData = [
@@ -99,15 +99,17 @@ function ChoiceTask({item,taskKey,saved,setSaved,unscored=false,onHint}:{item:Ch
 function Sorter({title,intro,items,categories,onHint}:{title:string;intro:string;items:typeof policyItems;categories:{name:string;clue:string}[];onHint:(cards:number[]|null)=>void}){
   const [selected,setSelected]=useState<number|null>(null),[dragged,setDragged]=useState<number|null>(null),[groups,setGroups]=useState<Record<number,string>>({}),[checked,setChecked]=useState(false);
   const placed=Object.keys(groups).length,done=placed===items.length,correct=done&&items.every((item,i)=>groups[i]===item.answer);
-  function place(i:number,group:string){setGroups(current=>({...current,[i]:group}));setSelected(null);setDragged(null);setChecked(false)}
-  return <div className="inquiry classify-inquiry g6-tool"><div className="classify-intro"><p className="eyebrow dark">動手探究・證據分類</p><h3>{title}</h3><p>{intro} 可拖曳，也能先點卡片再按「放入這欄」。</p><p className="classify-progress">已分類 <b>{placed}／{items.length}</b></p></div><div className="word-bank"><b>WORD BANK｜待分類線索</b><div>{items.map((item,i)=>groups[i]?null:<button key={item.text} draggable onDragStart={()=>setDragged(i)} onClick={()=>setSelected(i)} aria-pressed={selected===i} className={selected===i?"selected":""}><span aria-hidden="true">⠿</span>{item.text}</button>)}</div></div><div className={`category-bins ${categories.length===2?"category-bins-two":""}`}>{categories.map(category=><section className="category-bin" key={category.name} onDragOver={e=>e.preventDefault()} onDrop={()=>{if(dragged!==null)place(dragged,category.name)}}><header><b>{category.name}</b><span>{category.clue}</span></header>{selected!==null&&<button className="place-button" onClick={()=>place(selected,category.name)}>放入這欄</button>}<div className="bin-items">{items.map((item,i)=>groups[i]===category.name?<article key={item.text} className={checked?(item.answer===category.name?"item-correct":"item-wrong"):""}><b>{item.text}</b><button onClick={()=>{setGroups(current=>{const next={...current};delete next[i];return next});setChecked(false)}}>移回</button>{checked&&<p className={item.answer===category.name?"item-feedback good":"item-feedback try"}>{item.answer===category.name?`✓ ${item.why}`:`再想想：${item.why}`}</p>}</article>:null)}</div></section>)}</div><button className="tool-check" disabled={!done} onClick={()=>{setChecked(true);onHint(correct?null:[0,1,2])}}>檢查分類</button>{checked&&<p className={`tool-result ${correct?"correct":"retry"}`} role="status">{correct?"✓ 分類完成！你已把政策做法和影響連起來。":"紅色卡片需要換欄；先讀理由，再重新分類。"}</p>}</div>
+  function place(i:number,group:string){onHint(null);setGroups(current=>({...current,[i]:group}));setSelected(null);setDragged(null);setChecked(false)}
+  function check(){setChecked(true);const wrong=items.findIndex((item,i)=>groups[i]!==item.answer);onHint(wrong<0?null:[items[wrong].card])}
+  return <div className="inquiry classify-inquiry g6-tool"><div className="classify-intro"><p className="eyebrow dark">動手探究・證據分類</p><h3>{title}</h3><p>{intro} 可拖曳，也能先點卡片再按「放入這欄」。</p><p className="classify-progress">已分類 <b>{placed}／{items.length}</b></p></div><div className="word-bank"><b>WORD BANK｜待分類線索</b><div>{items.map((item,i)=>groups[i]?null:<button key={item.text} draggable onDragStart={()=>setDragged(i)} onClick={()=>setSelected(i)} aria-pressed={selected===i} className={selected===i?"selected":""}><span aria-hidden="true">⠿</span>{item.text}</button>)}</div></div><div className={`category-bins ${categories.length===2?"category-bins-two":""}`}>{categories.map(category=><section className="category-bin" key={category.name} onDragOver={e=>e.preventDefault()} onDrop={()=>{if(dragged!==null)place(dragged,category.name)}}><header><b>{category.name}</b><span>{category.clue}</span></header>{selected!==null&&<button className="place-button" onClick={()=>place(selected,category.name)}>放入這欄</button>}<div className="bin-items">{items.map((item,i)=>groups[i]===category.name?<article key={item.text} className={checked?(item.answer===category.name?"item-correct":"item-wrong"):""}><b>{item.text}</b><button onClick={()=>{onHint(null);setGroups(current=>{const next={...current};delete next[i];return next});setChecked(false)}}>移回</button>{checked&&<p className={item.answer===category.name?"item-feedback good":"item-feedback try"}>{item.answer===category.name?`✓ ${item.why}`:`再想想：${item.why}`}</p>}</article>:null)}</div></section>)}</div><button className="tool-check" disabled={!done} onClick={check}>檢查分類</button>{checked&&<p className={`tool-result ${correct?"correct":"retry"}`} role="status">{correct?"✓ 分類完成！你已把政策做法和影響連起來。":"紅色卡片需要換欄；上方只會點亮最相關的一張知識卡。"}</p>}</div>
 }
 
 function ChainPuzzle({onHint}:{onHint:(cards:number[]|null)=>void}){
   const [orders,setOrders]=useState([[2,0,1],[1,2,0]]),[selected,setSelected]=useState<{chain:number;index:number}|null>(null),[dragged,setDragged]=useState<{chain:number;index:number}|null>(null),[checked,setChecked]=useState(false);
   const correct=orders.every(order=>order.every((value,index)=>value===index));
-  function swap(chain:number,index:number){const source=dragged?.chain===chain?dragged:selected?.chain===chain?selected:null;if(!source){setSelected({chain,index});return}setOrders(current=>current.map((order,c)=>{if(c!==chain)return order;const next=[...order];[next[source.index],next[index]]=[next[index],next[source.index]];return next}));setSelected(null);setDragged(null);setChecked(false)}
-  return <div className="inquiry location-inquiry g6-tool"><div className="location-intro"><p className="eyebrow dark">動手探究・影響鏈排序</p><h3>從建設找到改變與代價</h3><p>每條都依「需求／條件 → 直接改變 → 長期影響」排列。可拖曳，或依序點兩張卡交換位置。</p></div><div className="impact-chains">{chainData.map((chain,c)=><section className="impact-chain" key={chain.title}><h4>{chain.title}</h4><div className="chain-role-labels" aria-hidden="true"><span>需求／條件</span><span>直接改變</span><span>長期影響</span></div><ol>{orders[c].map((itemIndex,index)=><li key={itemIndex} draggable onDragStart={()=>setDragged({chain:c,index})} onDragOver={e=>e.preventDefault()} onDrop={()=>swap(c,index)} className={selected?.chain===c&&selected.index===index?"selected":""}><button type="button" onClick={()=>swap(c,index)}><span className="drag-grip" aria-hidden="true">⠿</span><b>{chain.cards[itemIndex]}</b>{index<2&&<i aria-hidden="true">→</i>}</button></li>)}</ol></section>)}</div><button className="tool-check" onClick={()=>{setChecked(true);onHint(correct?null:[0,1,2])}}>檢查兩條影響鏈</button>{checked&&<p className={`tool-result ${correct?"correct":"retry"}`} role="status">{correct?"✓ 順序正確！公共建設先改變可達性與產業位置，再形成生活上的效益與代價。":"順序還要調整：先找為何要做，再找土地或人口的直接改變，最後才是長期結果。"}</p>}</div>
+  function swap(chain:number,index:number){onHint(null);const source=dragged?.chain===chain?dragged:selected?.chain===chain?selected:null;if(!source){setSelected({chain,index});return}setOrders(current=>current.map((order,c)=>{if(c!==chain)return order;const next=[...order];[next[source.index],next[index]]=[next[index],next[source.index]];return next}));setSelected(null);setDragged(null);setChecked(false)}
+  function check(){setChecked(true);const wrongChain=orders.findIndex(order=>order.some((value,index)=>value!==index));onHint(wrongChain<0?null:[wrongChain===0?1:2])}
+  return <div className="inquiry location-inquiry g6-tool"><div className="location-intro"><p className="eyebrow dark">動手探究・影響鏈排序</p><h3>從建設找到改變與代價</h3><p>每條都依「需求／條件 → 直接改變 → 長期影響」排列。可拖曳，或依序點兩張卡交換位置。</p></div><div className="impact-chains">{chainData.map((chain,c)=><section className="impact-chain" key={chain.title}><h4>{chain.title}</h4><div className="chain-role-labels" aria-hidden="true"><span>需求／條件</span><span>直接改變</span><span>長期影響</span></div><ol>{orders[c].map((itemIndex,index)=><li key={itemIndex} draggable onDragStart={()=>setDragged({chain:c,index})} onDragOver={e=>e.preventDefault()} onDrop={()=>swap(c,index)} className={selected?.chain===c&&selected.index===index?"selected":""}><button type="button" onClick={()=>swap(c,index)}><span className="drag-grip" aria-hidden="true">⠿</span><b>{chain.cards[itemIndex]}</b>{index<2&&<i aria-hidden="true">→</i>}</button></li>)}</ol></section>)}</div><button className="tool-check" onClick={check}>檢查兩條影響鏈</button>{checked&&<p className={`tool-result ${correct?"correct":"retry"}`} role="status">{correct?"✓ 順序正確！公共建設先改變可達性與產業位置，再形成生活上的效益與代價。":"順序還要調整：上方只會點亮與錯誤影響鏈最相關的一張知識卡。"}</p>}</div>
 }
 
 function certificateId(name:string){let value=0;for(const char of name)value=(value*31+char.charCodeAt(0))%100000;const d=new Date();return `G6U2-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}-${String(value).padStart(5,"0")}`}
