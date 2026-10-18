@@ -14,8 +14,8 @@ const STORE = "taiwan-explorer-grade6-unit1-v1";
 const emptySaved:Saved = { correct:{}, quizBest:0, quizAnswers:Array(15).fill(-1), name:"" };
 
 const warmups:Choice[] = [
-  { prompt:"買東西前，哪一個問題最能幫助你分辨『需要』與『想要』？", options:["現在沒有它，生活或學習會受到影響嗎？","廣告看起來熱鬧嗎？","同學都有買嗎？"], answer:0, why:"先看實際用途與急迫性，再決定是否購買。", hint:"先想物品是否能解決真正的生活或學習問題。" },
-  { prompt:"購物後保留發票、收據或訂單紀錄，主要有什麼用途？", options:["讓錢花得更多","日後核對或退換貨時作為證明","讓商品變得更便宜"], answer:1, why:"交易證明能協助核對金額、保固與退換貨。", hint:"如果商品有問題，店家需要看什麼證明？" },
+  { prompt:"買東西前，哪一個問題最能幫助你分辨『需要』與『想要』？", options:["沒有它會影響生活或學習嗎？","現在買是不是比較跟得上流行？","身邊同學是不是大多已經購買？"], answer:0, why:"先看實際用途與急迫性，再決定是否購買。", hint:"三個問題都很常出現在購物時，但只有一個在檢查真正用途。" },
+  { prompt:"購物後保留發票、收據或訂單紀錄，主要有什麼用途？", options:["方便整理每個月收藏的商品","作為核對金額與退換貨的證明","可以向店家換取下一次的折扣"], answer:1, why:"交易證明能協助核對金額、保固與退換貨。", hint:"想像商品有瑕疵時，哪一項資料能證明交易確實發生？" },
   { prompt:"想在 4 個月後存到 1,200 元，平均每月要存多少？", options:["200 元","250 元","300 元"], answer:2, why:"1,200 ÷ 4＝300，每月固定存 300 元可以達標。", hint:"把目標金額平均分成 4 份。" },
 ];
 
@@ -25,37 +25,37 @@ const lessons:Lesson[] = [
     { tag:"影響", title:"你的選擇會改變生產", visual:["🛒 需求改變","🏭 調整生產","💬 回饋再改進"], text:"消費者的需求與回饋會影響廠商開發商品、改變技術與生產數量；企業也會考量成本與市場反應。", bridge:"如果更多人選擇少糖、耐用商品，廠商可能怎麼做？" },
     { tag:"守護", title:"安全、權益與環境一起看", visual:["🔍 購前查資訊","🛡️ 留交易證明","♻️ 減量再使用"], text:"網購前看賣家信用、內容與退換貨規定；遇疑似詐騙可撥 165，消費爭議可洽 1950。耐用、維修、二手與再生材料也能減少浪費。", bridge:"商品出問題時，哪些資料能保護你？買得便宜一定最環保嗎？" },
   ], challenges:[
-    { prompt:"耳機仍可正常使用，新款正在限時特價。哪個做法最聰明？", options:["因為特價立刻下單","先確認是否需要、比較品質並檢查預算","只看網紅推薦就購買"], answer:1, why:"折扣不是需求；先評估用途、品質與負擔能力。", hint:"把『需要、品質、預算』三個條件一起檢查。", cards:[0] },
-    { prompt:"陌生賣家要求離開購物平台、私下轉帳才有優惠，應怎麼做？", options:["先停止交易並查證，必要時撥 165","趕快轉帳以免錯過","把帳號密碼也交給賣家"], answer:0, why:"離開平台會失去保障；可先查證並利用 165 防詐諮詢。", hint:"安全比折扣重要，想想哪個做法能保留平台保障。", cards:[2] },
-    { prompt:"越來越多人想買少糖、包裝可回收的飲料，廠商最合理的回應是？", options:["忽略需求，永遠不改配方","只增加廣告，不檢查產品","評估成本與技術，試做新產品並蒐集回饋"], answer:2, why:"生產者會綜合需求、成本、技術與回饋調整商品。", hint:"需求不會自動變成商品，還要經過評估、試做與改進。", cards:[1] },
-  ], scenario:{ prompt:"班上要訂活動上衣，哪個方案最能兼顧預算、使用與環境？", options:["挑最便宜但只能穿一次的材質","比較耐用度、價格與需求，選可重複穿且預算能負擔的款式","只選最貴的名牌"], answer:1, why:"同時考量價格、品質、真正需求與使用時間，才是較完整的決策。", hint:"不是最便宜或最貴就最好，要看能用多久與是否真的需要。", cards:[0,2] } },
+    { prompt:"耳機仍可正常使用，新款正在限時特價。哪個做法最聰明？", options:["趁優惠結束以前先購買新款","先確認需求並比較品質與預算","依照網紅推薦直接更換新款"], answer:1, why:"折扣不是需求；先評估用途、品質與負擔能力。", hint:"三個選項都回應了促銷，但哪一個同時檢查需求與負擔能力？", cards:[0] },
+    { prompt:"陌生賣家要求離開購物平台、私下轉帳才有優惠，應怎麼做？", options:["停止交易並透過官方管道查證","先轉小額款項測試賣家信用","請朋友一起購買來分攤風險"], answer:0, why:"離開平台會失去保障；可先查證並利用 165 防詐諮詢。", hint:"小額轉帳和多人購買仍可能受騙；找能保留保障並先查證的做法。", cards:[2] },
+    { prompt:"越來越多人想買少糖、包裝可回收的飲料，廠商最合理的回應是？", options:["維持原商品並增加促銷廣告","先大量生產再觀察是否熱賣","評估成本技術後試做並收回饋"], answer:2, why:"生產者會綜合需求、成本、技術與回饋調整商品。", hint:"消費需求是起點，但還要評估能否生產並透過試做降低風險。", cards:[1] },
+  ], scenario:{ prompt:"班上要訂活動上衣，哪個方案最能兼顧預算、使用與環境？", options:["選價格最低但布料較薄的款式","選價格適中且耐穿合用的款式","選價格較高但圖案流行的款式"], answer:1, why:"同時考量價格、品質、真正需求與使用時間，才是較完整的決策。", hint:"三件都能穿，但要同時比較價格、耐用程度與實際用途。", cards:[0,2] } },
   { id:2, icon:"📊", kicker:"第二課・理財規劃與風險", title:"未來規劃室", question:"如何分配金錢，並在報酬與風險之間做合適選擇？", concepts:["收支分配","儲蓄目標","理財工具","風險評估"], cards:[
     { tag:"分配", title:"先顧需要，再安排想要", visual:["🏠 必要支出","🎈 想要支出","🌱 儲蓄目標"], text:"收入有限時要排優先順序：先處理必要支出，再分配想要與儲蓄。目標要寫出金額、期限及每期存款。", bridge:"如果每一筆都花在想要，緊急需要出現時會怎樣？" },
     { tag:"工具", title:"不同任務，用不同工具", visual:["💧 活存可隨時用","🔒 定存約定期限","🛡️ 保險分擔衝擊"], text:"活期存款方便應急；短期不用的錢可評估定期存款；保險分擔重大事故衝擊。工具沒有絕對最好，要看目的。", bridge:"緊急預備金與半年後才要用的錢，適合放在同一處嗎？" },
     { tag:"風險", title:"報酬越吸引，越要看風險", visual:["📈 可能獲利","📉 也可能損失","🧠 先懂再決定"], text:"股票價格會波動，可能獲利也可能虧損。投資前要了解內容與費用、評估承受能力，不相信保證獲利或不明消息。", bridge:"有人說『一定賺、現在不買就來不及』，你應該先查什麼？" },
   ], challenges:[
-    { prompt:"家中臨時需要修理冰箱，哪筆錢最適合先使用？", options:["可隨時提領的緊急預備金","原本沒有、先借高利息貸款","全部拿去買波動大的股票"], answer:0, why:"緊急預備金重視流動性，適合處理突發必要支出。", hint:"找一項能在需要時立即使用、風險又低的安排。", cards:[0,1] },
-    { prompt:"有一筆錢半年內不會使用，又希望風險較低，可以先評估哪種工具？", options:["聽陌生人買熱門股票","短期定期存款","把錢全部花完"], answer:1, why:"定存需約定期間，但通常比活存利息高，適合短期不用且重視穩定的資金。", hint:"注意『半年不用』與『風險較低』兩個條件。", cards:[1] },
-    { prompt:"群組有人保證某股票下週一定大漲，最合適的反應是？", options:["立刻投入全部存款","轉傳給更多同學","不相信保證獲利，先查內容、風險與消息來源"], answer:2, why:"投資沒有保證獲利；需了解標的並評估可承受的損失。", hint:"任何高報酬承諾都要一起檢查風險與來源。", cards:[2] },
-  ], scenario:{ prompt:"小海每週有 200 元零用錢，又得到 300 元獎金；他想買 500 元禮物和 2,000 元手錶。哪個計畫較合理？", options:["立刻把所有錢買手錶，不記錄支出","先列需要與想要，設定期限並固定儲蓄，再決定購買順序","向同學借錢同時買完"], answer:1, why:"把目標、期限與每期存款寫清楚，才能判斷是否負擔得起。", hint:"好的計畫要有目標金額、期限、固定儲蓄和支出順序。", cards:[0] } },
+    { prompt:"家中臨時需要修理冰箱，哪筆錢最適合先使用？", options:["隨時可領用的緊急預備金","半年後到期的定期存款資金","準備承擔波動的股票資金"], answer:0, why:"緊急預備金重視流動性，適合處理突發必要支出。", hint:"三筆錢都可能取得，但哪一筆原本就是為突發需要準備？", cards:[0,1] },
+    { prompt:"有一筆錢半年內不會使用，希望比活存利息高且風險較低，可以先評估哪種工具？", options:["熱門股票，期待短期價格上漲","半年定存，接受約定期間限制","活期存款，保留隨時領用彈性"], answer:1, why:"定存需約定期間，但通常比活存利息高，適合短期不用且重視穩定的資金。", hint:"三種工具各有優點；請同時對照『半年不用、利息較高、風險較低』。", cards:[1] },
+    { prompt:"群組有人保證某股票下週一定大漲，最合適的反應是？", options:["先買少量，等上漲後再增加投入","詢問更多群友，再依多數意見決定","查消息來源、投資內容費用與風險"], answer:2, why:"投資沒有保證獲利；需了解標的並評估可承受的損失。", hint:"買得少或問更多群友都不能證明消息可靠；要回到可查證的資料。", cards:[2] },
+  ], scenario:{ prompt:"小海每週有 200 元零用錢，又得到 300 元獎金；他想買 500 元禮物和 2,000 元手錶。哪個計畫較合理？", options:["先買手錶，再看零用錢是否足夠","排定順序，算出每週固定儲蓄金額","先向同學借錢，同時完成兩個目標"], answer:1, why:"把目標、期限與每期存款寫清楚，才能判斷是否負擔得起。", hint:"三個方法都能讓購買開始，但哪一個不增加負債且能檢查是否可行？", cards:[0] } },
 ];
 
 const quiz:(Choice&{concept:string})[] = [
-  { prompt:"影響消費選擇的完整考量是？", options:["只看價格","價格、品質與個人需求","只看廣告"], answer:1, why:"聰明選擇要把價格、品質、需求與預算一起比較。", hint:"不能只看單一條件。", concept:"消費判斷" },
-  { prompt:"行動支付的便利可能帶來哪項風險？", options:["商品一定變耐用","付款沒有任何紀錄","容易忽略累積金額而衝動消費"], answer:2, why:"付款太方便時，若不查看紀錄與預算，可能不知不覺超支。", hint:"方便不等於不用控制。", concept:"支付與預算" },
-  { prompt:"消費需求增加時，生產者可能怎麼做？", options:["評估成本、技術與市場後調整生產","完全不理會市場","保證每項商品都成功"], answer:0, why:"生產決策會綜合市場需求、成本、技術與回饋。", hint:"需求是線索，不是唯一條件。", concept:"需求與生產" },
-  { prompt:"網購前哪個做法較安全？", options:["私下提供密碼","查賣家信用、商品內容與退換貨規定","只看最低價"], answer:1, why:"先查資訊與規定可降低詐騙及消費爭議。", hint:"購買前先確認保障。", concept:"消費安全" },
+  { prompt:"影響消費選擇的完整考量是？", options:["商品價格、廣告次數與包裝","商品品牌、流行程度與顏色","商品價格、品質與個人需求"], answer:2, why:"聰明選擇要把價格、品質、需求與預算一起比較。", hint:"三組條件都可能影響心情，但哪一組能檢查商品是否合用又負擔得起？", concept:"消費判斷" },
+  { prompt:"行動支付的便利可能帶來哪項風險？", options:["忽略累積金額而超出原定預算","付款太快而錯過商品折扣期限","交易紀錄分散而完全無法查詢"], answer:0, why:"付款太方便時，若不查看紀錄與預算，可能不知不覺超支。", hint:"行動支付仍有紀錄；真正的風險來自使用者容易忽略什麼？", concept:"支付與預算" },
+  { prompt:"消費需求增加時，生產者可能怎麼做？", options:["增加促銷廣告但不改變商品","評估成本技術後再調整生產","先大量生產再觀察市場反應"], answer:1, why:"生產決策會綜合市場需求、成本、技術與回饋。", hint:"只做廣告或先大量生產都忽略部分風險；哪一項先做完整評估？", concept:"需求與生產" },
+  { prompt:"網購前哪個做法較安全？", options:["私下聯絡以取得額外優惠","查信用、內容與退換貨規定","只比較價格與預計到貨速度"], answer:1, why:"先查資訊與規定可降低詐騙及消費爭議。", hint:"價格和速度很重要，但哪一項同時保留交易保障？", concept:"消費安全" },
   { prompt:"遇到疑似詐騙，可撥哪個電話查證？", options:["1950","119","165"], answer:2, why:"165 是防詐騙諮詢專線。", hint:"1950 是消費者服務專線。", concept:"防詐" },
-  { prompt:"哪個行動較能減少消費造成的環境負擔？", options:["延長使用、維修或捐贈仍可用的物品","每季丟掉仍能穿的衣服","只買更多一次性用品"], answer:0, why:"減量、再使用與延長壽命能減少生產及廢棄污染。", hint:"先讓物品用得更久。", concept:"環境責任" },
-  { prompt:"規畫家庭或個人支出時，第一步較適合做什麼？", options:["先買最想要的","分辨需要與想要並排優先順序","完全不看收入"], answer:1, why:"資源有限，要先確保必要支出，再安排想要與儲蓄。", hint:"先照顧最重要的生活需求。", concept:"收支分配" },
-  { prompt:"設定儲蓄目標需要哪些資料？", options:["只寫想買的東西","只看朋友存多少","目標金額、期限與每期存款"], answer:2, why:"具體的金額與期限，才能算出每期應存多少。", hint:"目標必須能計算。", concept:"儲蓄目標" },
-  { prompt:"活期存款最適合哪個用途？", options:["保留可隨時使用的生活或緊急資金","保證獲得最高報酬","用來追逐短期股價"], answer:0, why:"活存流動性高，適合日常與緊急資金。", hint:"關鍵是隨時可用。", concept:"活期存款" },
-  { prompt:"短期不使用、又重視穩定的錢，可評估什麼？", options:["高風險不明投資","定期存款","全部花掉"], answer:1, why:"定存約定期間，適合暫時不用且希望穩定的資金。", hint:"找低風險且有期限的工具。", concept:"定期存款" },
-  { prompt:"保險的主要功能是？", options:["保證快速致富","讓所有事故不會發生","分擔重大事故造成的財務衝擊"], answer:2, why:"保險不能阻止事故，但可依契約分擔損失。", hint:"它管理的是事故後的損失。", concept:"保險" },
-  { prompt:"記帳後還需要做什麼？", options:["定期檢視收支並調整計畫","把紀錄刪掉","只記收入不記支出"], answer:0, why:"記帳的價值在於看見習慣，進一步修正預算。", hint:"紀錄是為了做決策。", concept:"記帳" },
-  { prompt:"股票和存款相比，通常有什麼特性？", options:["完全沒有損失可能","價格波動較大，可能有較高獲利或虧損","一定比存款適合所有人"], answer:1, why:"報酬與風險並存，投資人需評估承受能力。", hint:"高報酬不會自動消除風險。", concept:"風險報酬" },
-  { prompt:"面對『保證獲利』的投資訊息，應怎麼做？", options:["立刻投入全部資金","只因朋友轉傳就相信","先查來源、內容、費用與風險"], answer:2, why:"投資沒有保證，資訊來源與風險都必須查證。", hint:"先懂再決定。", concept:"投資查證" },
-  { prompt:"最完整的理財觀念是？", options:["依目標分配金錢、記錄檢討並承擔合適風險","報酬越高越要投入全部金錢","想要的東西都要立刻買"], answer:0, why:"理財是依需要和目標規畫，並持續檢討風險與結果。", hint:"理財不是只追求賺錢。", concept:"理財規劃" },
+  { prompt:"哪個行動較能減少消費造成的環境負擔？", options:["維修、轉贈仍然可以使用的物品","更換、丟棄仍然可以使用的物品","囤積、購買更多功能相似的物品"], answer:0, why:"減量、再使用與延長壽命能減少生產及廢棄污染。", hint:"三個選項都在處理已有物品，哪一項能延長使用時間？", concept:"環境責任" },
+  { prompt:"規畫家庭或個人支出時，第一步較適合做什麼？", options:["先買想要商品再補足必要支出","先依朋友支出安排相同的預算","先分需要想要並排出優先順序"], answer:2, why:"資源有限，要先確保必要支出，再安排想要與儲蓄。", hint:"每個人的收入和需要不同；先找出不能延後的項目。", concept:"收支分配" },
+  { prompt:"設定儲蓄目標需要哪些資料？", options:["商品名稱、折扣與朋友的意見","目標金額、期限與每期的存款","品牌評價、顏色與購買的通路"], answer:1, why:"具體的金額與期限，才能算出每期應存多少。", hint:"哪一組資料可以直接算出每週或每月該存多少？", concept:"儲蓄目標" },
+  { prompt:"活期存款最適合哪個用途？", options:["保留可隨時使用的緊急資金","累積約定期間不用的閒置資金","承擔價格波動追求較高的報酬"], answer:0, why:"活存流動性高，適合日常與緊急資金。", hint:"比較三個用途最在意的是流動性、利息還是報酬。", concept:"活期存款" },
+  { prompt:"短期不使用、又重視穩定的錢，可評估什麼？", options:["活期存款，方便隨時提領","股票投資，承擔價格波動","定期存款，接受約定期間"], answer:2, why:"定存約定期間，適合暫時不用且希望穩定的資金。", hint:"題目已說短期不使用，所以可以用期限換取較穩定的利息。", concept:"定期存款" },
+  { prompt:"保險的主要功能是？", options:["分擔事故造成的財務衝擊","避免所有意外事故發生","保證每年獲得固定收益"], answer:0, why:"保險不能阻止事故，但可依契約分擔損失。", hint:"保險不能控制事故，也不是保證獲利；它處理的是事故後的什麼？", concept:"保險" },
+  { prompt:"記帳後還需要做什麼？", options:["只保留收入並刪除支出紀錄","定期檢視收支並調整計畫","維持原本計畫不再進行改變"], answer:1, why:"記帳的價值在於看見習慣，進一步修正預算。", hint:"如果紀錄顯示常常超支，下一步應該如何運用這項發現？", concept:"記帳" },
+  { prompt:"股票和存款相比，通常有什麼特性？", options:["價格波動且可能獲利也可能虧損","價格固定而且沒有損失可能","報酬穩定而且適合每一個人"], answer:0, why:"報酬與風險並存，投資人需評估承受能力。", hint:"股票價格會隨市場變動，因此結果不只一種。", concept:"風險報酬" },
+  { prompt:"面對『保證獲利』的投資訊息，應怎麼做？", options:["先投入少量，獲利之後再增加","先詢問朋友，依照多數意見決定","先查消息來源、相關費用與風險"], answer:2, why:"投資沒有保證，資訊來源與風險都必須查證。", hint:"投入少量和多人認同都不等於消息真實；找可驗證的做法。", concept:"投資查證" },
+  { prompt:"最完整的理財觀念是？", options:["依廣告推薦、追求較高的報酬","依目標分配、記錄並評估風險","依當下想要、再處理必要支出"], answer:1, why:"理財是依需要和目標規畫，並持續檢討風險與結果。", hint:"理財不只是消費或投資，而是一個持續規畫與檢討的過程。", concept:"理財規劃" },
 ];
 
 const classifyItems = [
@@ -86,8 +86,8 @@ function ConsumerClassifier(){
 }
 
 function BudgetLab(){
-  const [need,setNeed]=useState(350),[want,setWant]=useState(350),[save,setSave]=useState(300); const total=need+want+save, left=1000-total, valid=need>=300&&save>=300&&total<=1000;
-  return <div className="inquiry g6-tool budget-lab"><div className="tool-copy"><p className="eyebrow dark">動手探究・零用錢配置</p><h3>用 1,000 元完成本月計畫</h3><p>目標：先保留至少 300 元必要支出，每月儲蓄 300 元，4 個月後就能存到 1,200 元。拖動滑桿，在不超支的情況下安排想要。</p></div><div className="budget-controls">{[["必要支出",need,setNeed],["想要支出",want,setWant],["目標儲蓄",save,setSave]].map(([label,value,setter],index)=>{const inputId=`budget-range-${index}`;return <label key={label as string} htmlFor={inputId}><span><b>{label as string}</b><strong>{value as number} 元</strong></span><input id={inputId} aria-label={`${label as string}金額`} type="range" min="0" max="700" step="50" value={value as number} onChange={e=>(setter as React.Dispatch<React.SetStateAction<number>>)(Number(e.target.value))}/></label>})}<div className={`budget-total ${total>1000?"over":""}`}><span>已分配 {total} 元</span><b>{left>=0?`還有 ${left} 元可安排`:`超出 ${Math.abs(left)} 元`}</b></div><p className={`tool-result ${valid?"correct":"retry"}`} role="status">{valid?"✓ 計畫可行：先顧必要支出，也能按期達成儲蓄目標。":total>1000?"目前超支，請降低其中一項。":"再調整：必要支出與目標儲蓄都至少要保留 300 元。"}</p></div></div>
+  const fixed=450,[merch,setMerch]=useState(350),[snacks,setSnacks]=useState(100),[save,setSave]=useState(300); const total=fixed+merch+snacks+save, left=1000-total, valid=save>=300&&total<=1000;
+  return <div className="inquiry g6-tool budget-lab"><div className="tool-copy"><p className="eyebrow dark">動手探究・一週零用錢配置</p><h3>小晴的 1,000 元怎麼分？</h3><p>小晴這週有 1,000 元。四週後校外教學要用 1,200 元，所以這週至少要存 300 元。她還想買 350 元的偶像周邊；請幫她在不超支的情況下做取捨。</p><div className="budget-receipt" aria-label="本週固定必要支出"><b>先保留的必要支出</b><p><span>🥪 五天早餐</span><strong>60 × 5＝300 元</strong></p><p><span>🚌 交通卡加值</span><strong>150 元</strong></p><p className="receipt-total"><span>必要支出小計</span><strong>{fixed} 元</strong></p></div></div><div className="budget-controls"><label className="budget-item" htmlFor="budget-merch"><span><b>🎤 偶像周邊</b><strong>{merch} 元</strong></span><small>商品售價 350 元；調成 0 代表這週先不買。</small><input id="budget-merch" aria-label="本週偶像周邊支出" type="range" min="0" max="350" step="350" value={merch} onChange={e=>setMerch(Number(e.target.value))}/></label><label className="budget-item" htmlFor="budget-snacks"><span><b>🧋 點心飲料</b><strong>{snacks} 元</strong></span><small>每份約 50 元，可以減少次數但不必全部取消。</small><input id="budget-snacks" aria-label="本週點心飲料支出" type="range" min="0" max="200" step="50" value={snacks} onChange={e=>setSnacks(Number(e.target.value))}/></label><label className="budget-item" htmlFor="budget-saving"><span><b>🌱 校外教學儲蓄</b><strong>{save} 元</strong></span><small>四週存到 1,200 元，本週至少要存 300 元。</small><input id="budget-saving" aria-label="本週校外教學儲蓄" type="range" min="0" max="500" step="50" value={save} onChange={e=>setSave(Number(e.target.value))}/></label><div className={`budget-total ${total>1000?"over":""}`}><span>本週已安排 {total} 元</span><b>{left>=0?`還剩 ${left} 元可保留`:`超出 ${Math.abs(left)} 元`}</b></div><p className={`tool-result ${valid?"correct":"retry"}`} role="status">{valid?`✓ 計畫可行：早餐和交通有著落，也存下 ${save} 元。${merch===0?"偶像周邊延後購買，沒有動用目標儲蓄。":"仍買了周邊，但其他想要支出已做取捨。"}`:total>1000?"目前超支。早餐與交通不能少，請從偶像周邊、點心飲料中取捨，也別讓儲蓄低於 300 元。":"雖然沒有超支，但本週儲蓄不足 300 元，四週後會無法達成校外教學目標。"}</p></div></div>
 }
 
 function certificateId(name:string){let value=0;for(const char of name)value=(value*31+char.charCodeAt(0))%100000;const d=new Date();return `G6U1-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}-${String(value).padStart(5,"0")}`}
