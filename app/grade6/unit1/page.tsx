@@ -119,9 +119,42 @@ function ConsumerClassifier(){
   return <div className="inquiry classify-inquiry g6-tool"><div className="classify-intro"><p className="eyebrow dark">動手探究・消費決策分類</p><h3>先判斷目標，再採取行動</h3><p>從 word bank 拖曳卡片；也可以先點一張，再按分類欄的「放入這欄」。完成後檢查每個行動保護的是什麼。</p><p className="classify-progress">已分類 <b>{placed}／6</b></p></div><div className="word-bank"><b>WORD BANK｜待分類行動</b><div>{classifyItems.map((item,i)=>groups[i]?null:<button key={item.text} draggable onDragStart={()=>setDragged(i)} onClick={()=>setSelected(i)} aria-pressed={selected===i} className={selected===i?"selected":""}><span aria-hidden="true">⠿</span>{item.text}</button>)}</div></div><div className="category-bins">{categories.map(category=><section className="category-bin" key={category.name} onDragOver={e=>e.preventDefault()} onDrop={()=>{if(dragged!==null)place(dragged,category.name)}}><header><b>{category.name}</b><span>{category.clue}</span></header>{selected!==null&&<button className="place-button" onClick={()=>place(selected,category.name)}>放入這欄</button>}<div className="bin-items">{classifyItems.map((item,i)=>groups[i]===category.name?<article key={item.text} className={checked?(item.answer===category.name?"item-correct":"item-wrong"):""}><b>{item.text}</b><button onClick={()=>{setGroups(g=>{const n={...g};delete n[i];return n});setChecked(false)}}>移回</button>{checked&&<p className={item.answer===category.name?"item-feedback good":"item-feedback try"}>{item.answer===category.name?`✓ ${item.why}`:`換個角度：${item.why}`}</p>}</article>:null)}</div></section>)}</div><button className="tool-check" disabled={!done} onClick={()=>setChecked(true)}>檢查 6 張分類</button>{checked&&<p className={`tool-result ${correct?"correct":"retry"}`} role="status">{correct?"✓ 分類完成！你能區分消費前判斷、權益保障與環境責任。":"紅色卡片需要換欄；先讀理由，再重新分類。"}</p>}</div>
 }
 
+const budgetGroups = [
+  { key:"breakfast", icon:"🥪", label:"五天早餐", options:[
+    { label:"五天都自己準備", detail:"30 × 5 天", value:150 },
+    { label:"自備 2 天＋早餐店 3 天", detail:"30 × 2＋60 × 3", value:240 },
+    { label:"五天都在早餐店購買", detail:"60 × 5 天", value:300 },
+  ]},
+  { key:"transport", icon:"🚌", label:"交通卡", options:[
+    { label:"安全步行 2 天＋搭車 3 天", detail:"30 × 3 天", value:90 },
+    { label:"安全步行 1 天＋搭車 4 天", detail:"30 × 4 天", value:120 },
+    { label:"五天都使用大眾運輸", detail:"30 × 5 天", value:150 },
+  ]},
+  { key:"merch", icon:"🎤", label:"偶像周邊", options:[
+    { label:"這週先不買", detail:"保留選擇空間", value:0 },
+    { label:"購買徽章或小卡", detail:"選擇較低價品項", value:180 },
+    { label:"購買限量專輯", detail:"較高價的想要支出", value:350 },
+  ]},
+  { key:"snacks", icon:"🧋", label:"點心飲料", options:[
+    { label:"這週不另外購買", detail:"使用家中準備的點心", value:0 },
+    { label:"安排 1 次", detail:"50 × 1 次", value:50 },
+    { label:"安排 2 次", detail:"50 × 2 次", value:100 },
+  ]},
+  { key:"saving", icon:"🌱", label:"校外教學儲蓄", options:[
+    { label:"先存 250 元", detail:"四週後還差 200 元", value:250 },
+    { label:"固定存 300 元", detail:"四週剛好達成 1,200 元", value:300 },
+    { label:"多存一些 400 元", detail:"提早累積並保留彈性", value:400 },
+  ]},
+];
+
 function BudgetLab(){
-  const fixed=450,[merch,setMerch]=useState(350),[snacks,setSnacks]=useState(100),[save,setSave]=useState(300); const total=fixed+merch+snacks+save, left=1000-total, valid=save>=300&&total<=1000;
-  return <div className="inquiry g6-tool budget-lab"><div className="tool-copy"><p className="eyebrow dark">動手探究・一週零用錢配置</p><h3>小晴的 1,000 元怎麼分？</h3><p>小晴這週有 1,000 元。四週後校外教學要用 1,200 元，所以這週至少要存 300 元。她還想買 350 元的偶像周邊；請幫她在不超支的情況下做取捨。</p><div className="budget-receipt" aria-label="本週固定必要支出"><b>先保留的必要支出</b><p><span>🥪 五天早餐</span><strong>60 × 5＝300 元</strong></p><p><span>🚌 交通卡加值</span><strong>150 元</strong></p><p className="receipt-total"><span>必要支出小計</span><strong>{fixed} 元</strong></p></div></div><div className="budget-controls"><label className="budget-item" htmlFor="budget-merch"><span><b>🎤 偶像周邊</b><strong>{merch} 元</strong></span><small>商品售價 350 元；調成 0 代表這週先不買。</small><input id="budget-merch" aria-label="本週偶像周邊支出" type="range" min="0" max="350" step="350" value={merch} onChange={e=>setMerch(Number(e.target.value))}/></label><label className="budget-item" htmlFor="budget-snacks"><span><b>🧋 點心飲料</b><strong>{snacks} 元</strong></span><small>每份約 50 元，可以減少次數但不必全部取消。</small><input id="budget-snacks" aria-label="本週點心飲料支出" type="range" min="0" max="200" step="50" value={snacks} onChange={e=>setSnacks(Number(e.target.value))}/></label><label className="budget-item" htmlFor="budget-saving"><span><b>🌱 校外教學儲蓄</b><strong>{save} 元</strong></span><small>四週存到 1,200 元，本週至少要存 300 元。</small><input id="budget-saving" aria-label="本週校外教學儲蓄" type="range" min="0" max="500" step="50" value={save} onChange={e=>setSave(Number(e.target.value))}/></label><div className={`budget-total ${total>1000?"over":""}`}><span>本週已安排 {total} 元</span><b>{left>=0?`還剩 ${left} 元可保留`:`超出 ${Math.abs(left)} 元`}</b></div><p className={`tool-result ${valid?"correct":"retry"}`} role="status">{valid?`✓ 計畫可行：早餐和交通有著落，也存下 ${save} 元。${merch===0?"偶像周邊延後購買，沒有動用目標儲蓄。":"仍買了周邊，但其他想要支出已做取捨。"}`:total>1000?"目前超支。早餐與交通不能少，請從偶像周邊、點心飲料中取捨，也別讓儲蓄低於 300 元。":"雖然沒有超支，但本週儲蓄不足 300 元，四週後會無法達成校外教學目標。"}</p></div></div>
+  const [selected,setSelected]=useState<Record<string,number>>({});
+  const picked=budgetGroups.map(group=>group.options[selected[group.key]]).filter(Boolean);
+  const ready=picked.length===budgetGroups.length;
+  const total=picked.reduce((sum,option)=>sum+option.value,0),left=1000-total;
+  const saving=budgetGroups[4].options[selected.saving]?.value??0,merch=budgetGroups[2].options[selected.merch]?.value??0;
+  const valid=ready&&total<=1000&&saving>=300;
+  return <div className="inquiry g6-tool budget-lab"><div className="tool-copy"><p className="eyebrow dark">動手探究・一週零用錢配置</p><h3>小晴的 1,000 元怎麼分？</h3><p>小晴四週後要準備 1,200 元校外教學費。請替早餐、交通、周邊、點心與儲蓄各選一張卡，排出本週方案。</p><div className="budget-rules"><b>方案通過條件</b><p><span>①</span>五項都要做出選擇</p><p><span>②</span>總支出不能超過 1,000 元</p><p><span>③</span>本週至少存下 300 元</p></div><p className="budget-possibility"><b>沒有唯一答案：</b>可以買周邊，也可以不買；重點是你如何調整其他選擇，仍守住需要、預算與目標。</p></div><div className="budget-choice-panel"><p className="budget-progress">已選擇 <b>{picked.length}／5</b> 項</p><div className="budget-choice-groups">{budgetGroups.map(group=><fieldset key={group.key}><legend><span aria-hidden="true">{group.icon}</span>{group.label}</legend><div>{group.options.map((option,i)=><button type="button" key={option.label} aria-pressed={selected[group.key]===i} className={selected[group.key]===i?"selected":""} onClick={()=>setSelected(current=>({...current,[group.key]:i}))}><b>{option.label}</b><small>{option.detail}</small><strong>{option.value} 元</strong></button>)}</div></fieldset>)}</div><div className={`budget-total ${ready&&total>1000?"over":""}`}><span>{ready?`本週共安排 ${total} 元`:`目前已安排 ${total} 元`}</span><b>{ready?(left>=0?`還剩 ${left} 元可保留`:`超出 ${Math.abs(left)} 元`):"請完成五項選擇"}</b></div>{!ready?<p className="tool-result retry" role="status">再選 {budgetGroups.length-picked.length} 項，就能檢查整體方案。</p>:<p className={`tool-result ${valid?"correct":"retry"}`} role="status">{valid?`✓ 這是一個可行組合：需要有安排、沒有超支，也存下 ${saving} 元。${merch>0?`你仍買了 ${merch} 元周邊，表示合理取捨不等於什麼都不能買。`:"你選擇延後周邊，把更多彈性留給未來。"}`:total>1000?`目前超支 ${Math.abs(left)} 元。請改選至少一項，但不必固定放棄周邊。`:"總額沒有超支，但只存了 250 元。請調整其他項目，讓本週儲蓄至少達到 300 元。"}</p>}</div></div>
 }
 
 function certificateId(name:string){let value=0;for(const char of name)value=(value*31+char.charCodeAt(0))%100000;const d=new Date();return `G6U1-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}-${String(value).padStart(5,"0")}`}
