@@ -5,10 +5,13 @@ import Home from "../../app/page";
 import Courses from "../../app/courses/page";
 import Unit2 from "../../app/unit2/page";
 import Grade6Unit1 from "../../app/grade6/unit1/page";
+import Grade6Unit2 from "../../app/grade6/unit2/page";
 
 const repoBase = "/115social";
 const pathname = window.location.pathname.replace(repoBase, "").replace(/\/$/, "") || "/";
-const Page = pathname.startsWith("/grade6/unit1")
+const Page = pathname.startsWith("/grade6/unit2")
+  ? Grade6Unit2
+  : pathname.startsWith("/grade6/unit1")
   ? Grade6Unit1
   : pathname.startsWith("/unit2")
   ? Unit2
