@@ -1,0 +1,131 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+
+const assetBase = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+type Choice = { prompt:string; options:string[]; answer:number; why:string; hint:string; cards?:number[] };
+type Card = { tag:string; title:string; visual:string[]; text:string; bridge:string; guide:string };
+type Lesson = { id:number; icon:string; kicker:string; title:string; question:string; concepts:string[]; cards:Card[]; challenges:Choice[]; scenario:Choice };
+type Saved = { correct:Record<string,boolean>; quizBest:number; quizAnswers:number[]; name:string };
+
+const STORE = "taiwan-explorer-unit3-v1";
+const emptySaved:Saved = { correct:{}, quizBest:0, quizAnswers:Array(15).fill(-1), name:"" };
+
+const warmups:Choice[] = [
+  { prompt:"一群人離開原鄉，到陌生地方尋找土地與工作。判斷原因時，最需要先比較什麼？", options:["原鄉的生活壓力與新地點的吸引力","兩地使用的地名是否相同","旅程中搭乘的船隻大小"], answer:0, why:"人口移動通常同時受到原鄉推力與目的地拉力影響。", hint:"想一想：為什麼想離開？又為什麼選擇那裡？" },
+  { prompt:"一條水圳讓農田獲得穩定灌溉後，最合理的後續影響是？", options:["主要提高農地價格，人口與交易變化較小","產量增加，聚落與交易可能跟著成長","農產品增加後聚落會分散，港口需求反而下降"], answer:1, why:"穩定水源能擴大耕地與產量，進一步帶動人口、聚落和商業。", hint:"從水源開始，依序想農業、人口與商業會怎麼改變。" },
+  { prompt:"外國勢力進入後，政府開始修築砲臺、鐵路與電報。這些證據最能說明什麼？", options:["政府會先暫停港口貿易，再考慮內部建設","鐵路電報主要服務商業，與防務需求關係較小","外在威脅可能促使治理政策與建設改變"], answer:2, why:"外力衝擊使清帝國從消極治理轉向加強防務與現代化建設。", hint:"把外國入侵、政府反應和建設結果連成一條因果鏈。" },
+];
+
+const lessons:Lesson[] = [
+  { id:1, icon:"🌾", kicker:"第一課・移民開墾與族群互動", title:"家園開拓調查局", question:"早期移民如何在限制、環境與族群互動中建立家園？", concepts:["渡臺限制","水利開墾","民變械鬥","族群文化"], cards:[
+    { tag:"移動", title:"限制很多，仍有人渡海", visual:["原鄉人多地少","臺灣土地吸引","申請或冒險渡海"], text:"清帝國初期限制人民渡臺，要求申請且不准攜帶家眷。但福建、廣東人口增加、耕地不足，臺灣又適合水稻生長，仍有許多人前來尋找生活機會。", bridge:"為什麼渡臺有風險，仍有人願意前來？", guide:"原鄉耕地不足是把人推走的壓力；臺灣可開墾的土地與生活機會則形成吸引力。當期待的收穫大於風險，有些人便選擇申請或冒險渡海。" },
+    { tag:"合作", title:"水圳把農田連成聚落", visual:["興建水圳穩定水源","稻米蔗糖產量增加","港口市街與交易成長"], text:"移民為了穩定灌溉而興建瑠公圳、八堡圳、曹公圳等水利設施。農產增加後，稻米與蔗糖輸往中國，府城、鹿港、艋舺也成為重要貿易港口。", bridge:"一條水圳為什麼不只改變農田，也會改變聚落與商業？", guide:"穩定水源讓耕地與產量增加，需要更多人力、倉儲和運輸；人口與貨物集中後，市街、港口和交易便跟著成長。" },
+    { tag:"影響", title:"開墾也帶來衝突與文化改變", visual:["人口與土地需求上升","民變械鬥與越界開墾","遷徙融合及文化流失"], text:"官員治理不當引發民變，不同群體也可能因土地、水源與利益發生械鬥。漢人開墾範圍擴大，壓縮原住民族生活空間；通婚、租地與教育則使部分平埔族群逐漸漢化。", bridge:"建立新家園時，為什麼有人受益，也有人失去土地與文化？", guide:"土地和水源有限，不同群體擁有的權力也不相同。開墾帶來生產與聚落，卻可能把成本轉給原本居住者，因此要同時看受益者與承擔者。" },
+  ], challenges:[
+    { prompt:"清帝國限制渡臺，仍有許多人前來，最完整的解釋是？", options:["沿海貿易增加，移民多半想經營港口商業","原鄉耕地不足，而臺灣有可開墾土地與生活機會","渡臺申請逐漸簡化，攜帶家眷的成本因而降低"], answer:1, why:"原鄉的人口與耕地壓力，加上臺灣的土地條件，共同推動移民。", hint:"答案要同時說明離開原鄉與選擇臺灣的理由。", cards:[0] },
+    { prompt:"八堡圳興建後吸引人口並形成街市，哪條因果關係最合理？", options:["水圳提高土地價格，先吸引商人再發展農業","水圳改善日常飲水，居民增加後才開始種稻","穩定灌溉提高產量，貨物與人口集中後帶動聚落"], answer:2, why:"水利先改善農業，再透過產量、人口與交易推動聚落發展。", hint:"先找水圳直接改變什麼，再判斷長期影響。", cards:[1] },
+    { prompt:"關於民變與械鬥，哪個分辨最正確？", options:["民變是民眾反抗政府；械鬥是武裝群體間的衝突","民變多為群體爭奪水源；械鬥則是官民之間對抗","兩者都和治理或資源競爭有關，因此衝突對象相同"], answer:0, why:"民變指向政府統治，械鬥則多是群體因土地、水源或利益衝突。", hint:"先確認衝突的對象：是政府，還是另一個群體？", cards:[2] },
+  ], scenario:{ prompt:"兩個聚落都需要同一條水圳灌溉，枯水期水量不足。哪個做法最能降低衝突？", options:["由上游聚落先取足用水，下游再自行設法","共同記錄水量、排定輪灌並分工維護水圳","讓願意付最高費用的農戶優先使用"], answer:1, why:"共享資源需要透明資料、共同規則與維護責任，才能兼顧不同群體。", hint:"哪個方案不只分配水，也建立可共同遵守的規則？", cards:[1,2] } },
+
+  { id:2, icon:"⚓", kicker:"第二課・開港通商與現代化", title:"港口轉型觀測站", question:"開港、外力衝擊與西方人士，如何改變臺灣的經濟與社會？", concepts:["開港通商","經濟重心北移","外力衝擊","西方文化"], cards:[
+    { tag:"貿易", title:"港口打開，經濟重心北移", visual:["四個港口對外通商","茶糖樟腦銷往世界","大稻埕興起與北部成長"], text:"1860年代，雞籠、淡水、安平與打狗開放通商。茶、糖、樟腦外銷，洋行與新市街出現；因茶與樟腦多產於北部，經濟重心逐漸由南向北移動。", bridge:"大稻埕沒有種茶，為什麼能成為重要的茶葉集散地？", guide:"大稻埕靠近淡水港，又能連接北部茶產地。產地的貨物先集中、加工和交易，再由港口出口，因此交通位置比是否種茶更關鍵。" },
+    { tag:"治理", title:"外力衝擊改變治理態度", visual:["牡丹社事件與清法戰爭","海防建設及臺灣建省","鐵路輪船電報現代化"], text:"牡丹社事件使清帝國加強南部海防；清法戰爭後，臺灣建省，劉銘傳推動鐵路、輪船與電報。治理態度由限制與消極，轉為重視防務和建設。", bridge:"為什麼戰爭與外國威脅，反而成為建設加速的原因？", guide:"外力讓清帝國看見臺灣的戰略位置與治理不足。為了快速運兵、傳遞消息並鞏固統治，防務、交通和通訊建設便同時加速。" },
+    { tag:"交流", title:"西方人帶來知識，也經歷磨合", visual:["斯文豪調查自然","馬偕推動醫療教育","巴克禮發展印刷出版"], text:"開港後，外國人來臺經商、研究與傳教。斯文豪記錄物種，馬偕推動醫療及教育，巴克禮發展台語羅馬字與印刷出版；文化差異也曾造成誤解與衝突。", bridge:"傳教士為什麼常同時行醫、辦學或出版？", guide:"醫療、教育和出版回應居民需求，也創造接觸與信任的機會。人們先從實際幫助理解新知識，再逐步認識傳教士的信仰與文化。" },
+  ], challenges:[
+    { prompt:"開港後臺灣經濟重心逐漸北移，最重要的證據組合是？", options:["南部糖業出口成長較慢，商人因而改到北部經營","北部較早出現領事館，商品便自然集中到附近","北部盛產茶與樟腦，淡水港又便於集散出口"], answer:2, why:"北部出口作物與淡水港的交通條件，共同帶動大稻埕等市街。", hint:"要同時找到商品產地與出口港口的連結。", cards:[0] },
+    { prompt:"牡丹社事件與清法戰爭之後，清帝國治理臺灣出現什麼共同轉變？", options:["更重視海防、行政與交通通訊建設","治理重點仍以限制移民為主，建設變化較少","先擴大對外貿易，再逐步處理軍事防禦"], answer:0, why:"外力衝擊促使清帝國加強防務、建省並推動現代化建設。", hint:"比較事件前後，政府投入臺灣的程度有何不同？", cards:[1] },
+    { prompt:"斯文豪、馬偕與巴克禮的活動，共同說明開港帶來哪種影響？", options:["西方人的活動以傳教為主，自然研究與出版影響較小","自然研究、醫療教育與出版等知識交流增加","三人雖帶來新知識，但主要服務在臺外國人社群"], answer:1, why:"開港帶來多面向知識交流，但接受過程也有磨合與衝突。", hint:"找出能涵蓋三人的工作，也保留文化磨合的說法。", cards:[2] },
+  ], scenario:{ prompt:"地方要保存一座清末港口洋行舊建築，哪個方案最能連結歷史與今日生活？", options:["只修復外觀並禁止民眾進入，以免建物受損","調查史料後規畫展覽、導覽與社區共同使用空間","改成一般商店，只留下建築名稱作為紀念"], answer:1, why:"保存不只留下外觀，也要用可靠史料說明歷史，並讓社區持續參與。", hint:"哪個方案同時做到保存、理解與公共使用？", cards:[0,2] } },
+];
+
+const quiz:(Choice&{concept:string})[] = [
+  { prompt:"清帝國初期限制人民渡臺，主要擔心什麼？", options:["移民與原住民族交易增加，地方市場難以管理","移民增加可能造成反叛與治理困難","移民開墾太快，農產品價格可能下跌"], answer:1, why:"清帝國擔心大量漢人移入後難以管理並發生反叛。", hint:"回想限制申請與不准攜眷背後的治理考量。", concept:"渡臺政策" },
+  { prompt:"許多人冒險渡臺，最主要的推力與拉力組合是？", options:["原鄉耕地不足；臺灣適合開墾","原鄉港口貿易較少；臺灣市街較繁榮","原鄉賦稅增加；臺灣容易取得官職"], answer:0, why:"福建、廣東人多地少，臺灣的自然條件與土地機會形成吸引。", hint:"一邊是生活壓力，一邊是新機會。", concept:"移民原因" },
+  { prompt:"興建水圳對地方發展最完整的影響是？", options:["只提高土地價格，不影響農業生產","讓港口不再需要船運與倉儲","穩定灌溉、增加產量，進而吸引人口與交易"], answer:2, why:"水圳先改善農業，再帶動聚落與商業。", hint:"依序思考水源、農產、人口與交易。", concept:"水利開墾" },
+  { prompt:"「一府二鹿三艋舺」反映什麼現象？", options:["三地因官署設置而成為主要行政中心","農產與貨物往來帶動重要港口市街","移民依原鄉分居，使三地形成防禦聚落"], answer:1, why:"府城、鹿港、艋舺因貨物流通成為重要貿易港口。", hint:"這句話和稻米、蔗糖及民生用品的交易有關。", concept:"港口市街" },
+  { prompt:"民變與械鬥的主要差別是？", options:["民變多因官員貪汙；械鬥只因宗教差異","民變發生於城市；械鬥多發生於農村","民變反抗政府；械鬥是群體間武裝衝突"], answer:2, why:"兩者可由衝突對象來區分。", hint:"看對立的另一方是政府還是其他群體。", concept:"社會衝突" },
+  { prompt:"漢人開墾範圍擴大，對原住民族最可能造成什麼影響？", options:["生活空間縮減，部分族群遷徙或融入漢人社會","土地交易增加，使各族群平均取得新農地","界線向山區移動，使原住民族耕地同步擴大"], answer:0, why:"越界開墾、土地交易與文化接觸改變了原住民族生活。", hint:"同時思考土地與文化兩個面向。", concept:"族群互動" },
+  { prompt:"1860年代開放通商的四個港口包括哪些？", options:["雞籠、淡水、安平、打狗","府城、鹿港、艋舺、花蓮","宜蘭、彰化、嘉義、恆春"], answer:0, why:"四個通商港口連結北部與南部的對外貿易。", hint:"兩個在北部、兩個在南部。", concept:"開港通商" },
+  { prompt:"大稻埕成為茶葉集散地的關鍵條件是？", options:["本地商人較早引進西式製茶機器","清帝國把茶園集中遷到大稻埕附近","鄰近淡水港，又能連接北部茶產地"], answer:2, why:"交通與集散位置讓大稻埕成為茶商中心。", hint:"集散地不一定是產地。", concept:"經濟重心" },
+  { prompt:"開港通商後，臺灣經濟重心北移的主要原因是？", options:["北部洋行數量增加，南部港口因而停止貿易","茶與樟腦多在北部，且可經淡水港出口","北部人口成長較快，所以農產需求較高"], answer:1, why:"北部出口作物和港口條件共同促成經濟成長。", hint:"把商品分布與港口位置一起看。", concept:"經濟重心" },
+  { prompt:"牡丹社事件後，清帝國首先加強哪方面？", options:["北部港口的茶葉倉儲與洋行管理","南部農村的水圳與土地分配","南部海防與軍事建設"], answer:2, why:"沈葆楨來臺興建砲臺、恆春城並加強防務。", hint:"事件涉及外國軍隊登陸南臺灣。", concept:"牡丹社事件" },
+  { prompt:"清法戰爭對臺灣治理的重要影響是？", options:["促使臺灣建省並推動現代化建設","使治理重新轉向限制移民與開墾","讓港口貿易取代軍事防禦成為唯一重點"], answer:0, why:"戰後清帝國更重視臺灣，設省並任命劉銘傳治理。", hint:"注意戰爭後行政地位與建設的變化。", concept:"清法戰爭" },
+  { prompt:"劉銘傳推動鐵路、輪船與電報，主要改善什麼？", options:["軍隊駐紮與城牆防禦，但民間往來影響不大","人員貨物運輸與遠距訊息傳遞","農田灌溉與族群土地界線的管理"], answer:1, why:"交通與通訊建設提升臺灣內外聯繫。", hint:"三項建設都和移動或傳訊有關。", concept:"現代化" },
+  { prompt:"斯文豪對臺灣的重要貢獻是？", options:["推動西式教育並培養傳教人才","調查並記錄許多臺灣物種","引進印刷技術並發行報紙"], answer:1, why:"斯文豪以外交官及博物學者身分研究臺灣自然。", hint:"他留下《福爾摩沙鳥類誌》等自然紀錄。", concept:"自然研究" },
+  { prompt:"馬偕推動醫療與教育，對傳教有什麼幫助？", options:["回應居民需要，增加接觸與理解的機會","以西式學校取代地方所有原有教育","先要求居民改變信仰，再提供醫療服務"], answer:0, why:"實際服務建立接觸與信任，但文化交流仍需磨合。", hint:"想想免費醫療、學校與居民關係的變化。", concept:"文化交流" },
+  { prompt:"巴克禮對臺灣文化的重要影響包括什麼？", options:["茶葉加工、港口貿易與洋行經營","砲臺設計、鐵路建設與電報架設","台語羅馬字、印刷技術與報紙出版"], answer:2, why:"巴克禮翻譯、引進印刷並發行臺灣府城教會報。", hint:"他的工作和文字傳播及文化保存有關。", concept:"出版文化" },
+];
+
+const settlementItems = [
+  { text:"福建、廣東人口增加，耕地不足", answer:"渡海動力", why:"原鄉生活壓力促使人們向外尋找土地。", card:0 },
+  { text:"臺灣氣候與土地適合水稻耕作", answer:"渡海動力", why:"目的地的自然條件形成吸引力。", card:0 },
+  { text:"興建水圳，讓灌溉水源更穩定", answer:"建立家園", why:"共同建設改善農業生產條件。", card:1 },
+  { text:"稻米蔗糖外銷，港口市街逐漸成長", answer:"建立家園", why:"農產與交易帶動聚落發展。", card:1 },
+  { text:"為土地、水源與利益發生民變或械鬥", answer:"社會變化", why:"治理不足與資源競爭造成衝突。", card:2 },
+  { text:"漢人開墾擴大，部分原住民族遷徙或漢化", answer:"社會變化", why:"人口與土地關係改變族群生活。", card:2 },
+];
+
+const changeChains = [
+  { title:"開港與經濟重心轉移", card:0, cards:["四個港口開放，洋行進入臺灣","北部茶與樟腦集中到淡水附近出口","大稻埕興起，經濟重心逐漸北移"] },
+  { title:"外力衝擊與治理轉向", card:1, cards:["日本、法國等外力讓清帝國感到威脅","加強海防、建省並由劉銘傳治理","鐵路、輪船與電報推動現代化"] },
+];
+
+function ChoiceTask({item,taskKey,saved,setSaved,unscored=false,onHint}:{item:Choice;taskKey:string;saved:Saved;setSaved:React.Dispatch<React.SetStateAction<Saved>>;unscored?:boolean;onHint?:(cards:number[]|null)=>void}){
+  const [picked,setPicked]=useState<number|null>(null);
+  const right=picked===item.answer,done=!!saved.correct[taskKey];
+  function choose(i:number){setPicked(i);if(i===item.answer){onHint?.(null);if(!unscored)setSaved(s=>({...s,correct:{...s.correct,[taskKey]:true}}))}else onHint?.(item.cards??null)}
+  return <div className={`choice-task ${done?"is-complete":""}`}>
+    <div className="task-heading">{done?"✓ 已完成":unscored?"暖身練習":"等待解鎖"}</div>
+    <h4>{item.prompt}</h4>
+    <div className="choice-grid">{item.options.map((o,i)=><button key={o} className={picked===i?(right?"right":"wrong"):""} onClick={()=>choose(i)}>{String.fromCharCode(65+i)}. {o}</button>)}</div>
+    {picked!==null&&<div className={`feedback ${right?"good":"try"}`} role="status"><span>{right?`判斷有根據：${item.why}`:`思考提示：${item.hint}`}</span>{!right&&item.cards?.length&&<a className="hint-card-link" href={`#u3-${taskKey.includes("l2")?2:1}-card-${item.cards[0]}`}>查看上方發亮的知識卡 ↑</a>}</div>}
+  </div>
+}
+
+function Sorter({onHint}:{onHint:(cards:number[]|null)=>void}){
+  const categories=[{name:"渡海動力",clue:"為什麼離開原鄉、選擇臺灣"},{name:"建立家園",clue:"如何改善生產並形成聚落"},{name:"社會變化",clue:"人口增加後的衝突與文化影響"}];
+  const [selected,setSelected]=useState<number|null>(null),[dragged,setDragged]=useState<number|null>(null),[groups,setGroups]=useState<Record<number,string>>({}),[checked,setChecked]=useState(false);
+  const placed=Object.keys(groups).length,done=placed===settlementItems.length,correct=done&&settlementItems.every((item,i)=>groups[i]===item.answer);
+  function place(i:number,group:string){onHint(null);setGroups(current=>({...current,[i]:group}));setSelected(null);setDragged(null);setChecked(false)}
+  function check(){setChecked(true);const wrong=settlementItems.findIndex((item,i)=>groups[i]!==item.answer);onHint(wrong<0?null:[settlementItems[wrong].card])}
+  return <div className="inquiry classify-inquiry g6-tool"><div className="classify-intro"><p className="eyebrow dark">動手探究・家園證據分類</p><h3>從渡海動力找到社會變化</h3><p>把 6 張線索拖進最能解釋它的欄位，也能先點線索再按「放入這欄」。</p><p className="classify-progress">已分類 <b>{placed}／{settlementItems.length}</b></p></div>
+    <div className="word-bank"><b>WORD BANK｜待分類線索</b><div>{settlementItems.map((item,i)=>groups[i]?null:<button key={item.text} draggable onDragStart={()=>setDragged(i)} onClick={()=>setSelected(i)} aria-pressed={selected===i} className={selected===i?"selected":""}><span aria-hidden="true">⠿</span>{item.text}</button>)}</div></div>
+    <div className="category-bins">{categories.map(category=><section className="category-bin" key={category.name} onDragOver={e=>e.preventDefault()} onDrop={()=>{if(dragged!==null)place(dragged,category.name)}}><header><b>{category.name}</b><span>{category.clue}</span></header>{selected!==null&&<button className="place-button" onClick={()=>place(selected,category.name)}>放入這欄</button>}<div className="bin-items">{settlementItems.map((item,i)=>groups[i]===category.name?<article key={item.text} className={checked?(item.answer===category.name?"item-correct":"item-wrong"):""}><b>{item.text}</b><button onClick={()=>{onHint(null);setGroups(current=>{const next={...current};delete next[i];return next});setChecked(false)}}>移回</button>{checked&&<p className={item.answer===category.name?"item-feedback good":"item-feedback try"}>{item.answer===category.name?`✓ ${item.why}`:`再想想：${item.why}`}</p>}</article>:null)}</div></section>)}</div>
+    <button className="tool-check" disabled={!done} onClick={check}>檢查分類</button>{checked&&<p className={`tool-result ${correct?"correct":"retry"}`} role="status">{correct?"✓ 分類完成！你已把移民、開墾與社會影響連起來。":"紅色卡片需要換欄；上方只會點亮最相關的一張知識卡。"}</p>}
+  </div>
+}
+
+function ChainPuzzle({onHint}:{onHint:(cards:number[]|null)=>void}){
+  const [orders,setOrders]=useState([[2,0,1],[1,2,0]]),[selected,setSelected]=useState<{chain:number;index:number}|null>(null),[dragged,setDragged]=useState<{chain:number;index:number}|null>(null),[checked,setChecked]=useState(false);
+  const correct=orders.every(order=>order.every((value,index)=>value===index));
+  function swap(chain:number,index:number){onHint(null);const source=dragged?.chain===chain?dragged:selected?.chain===chain?selected:null;if(!source){setSelected({chain,index});return}setOrders(current=>current.map((order,c)=>{if(c!==chain)return order;const next=[...order];[next[source.index],next[index]]=[next[index],next[source.index]];return next}));setSelected(null);setDragged(null);setChecked(false)}
+  function check(){setChecked(true);const wrong=orders.findIndex(order=>order.some((value,index)=>value!==index));onHint(wrong<0?null:[changeChains[wrong].card])}
+  return <div className="inquiry location-inquiry g6-tool"><div className="location-intro"><p className="eyebrow dark">動手探究・轉變因果鏈</p><h3>從事件排出政策與影響</h3><p>每條都依「事件／條件 → 直接改變 → 長期影響」排列。可拖曳，或依序點兩張卡交換。</p></div><div className="impact-chains">{changeChains.map((chain,c)=><section className="impact-chain" key={chain.title}><h4>{chain.title}</h4><div className="chain-role-labels" aria-hidden="true"><span>事件／條件</span><span>直接改變</span><span>長期影響</span></div><ol>{orders[c].map((itemIndex,index)=><li key={itemIndex} draggable onDragStart={()=>setDragged({chain:c,index})} onDragOver={e=>e.preventDefault()} onDrop={()=>swap(c,index)} className={selected?.chain===c&&selected.index===index?"selected":""}><button type="button" onClick={()=>swap(c,index)}><span className="drag-grip" aria-hidden="true">⠿</span><b>{chain.cards[itemIndex]}</b>{index<2&&<i aria-hidden="true">→</i>}</button></li>)}</ol></section>)}</div><button className="tool-check" onClick={check}>檢查兩條因果鏈</button>{checked&&<p className={`tool-result ${correct?"correct":"retry"}`} role="status">{correct?"✓ 順序正確！你已掌握開港與外力如何改變臺灣。":"順序還要調整；上方只會點亮與錯誤因果鏈最相關的一張知識卡。"}</p>}</div>
+}
+
+function certificateId(name:string){let value=0;for(const char of name)value=(value*31+char.charCodeAt(0))%100000;const d=new Date();return `G5U3-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}-${String(value).padStart(5,"0")}`}
+function makeCertificate(name:string,score:number){const id=certificateId(name),canvas=document.createElement("canvas");canvas.width=1600;canvas.height=1100;const c=canvas.getContext("2d")!;c.fillStyle="#fffaf0";c.fillRect(0,0,1600,1100);c.strokeStyle="#9a3412";c.lineWidth=28;c.strokeRect(35,35,1530,1030);c.strokeStyle="#f4c95d";c.lineWidth=5;c.strokeRect(70,70,1460,960);c.textAlign="center";c.fillStyle="#9a3412";c.font="700 40px sans-serif";c.fillText("115 社會自主學習網・五年級",800,180);c.fillStyle="#083344";c.font="900 82px sans-serif";c.fillText("第三單元學習證書",800,315);c.fillStyle="#557176";c.font="34px sans-serif";c.fillText("恭喜",800,410);c.fillStyle="#083344";c.font="900 72px sans-serif";c.fillText(name,800,515);c.fillStyle="#557176";c.font="34px sans-serif";c.fillText("完成《成為清帝國的領土》自學任務",800,610);c.fillText("能用證據解釋移民開墾、開港通商與現代化轉變",800,670);c.fillStyle="#ef6f51";c.font="900 48px sans-serif";c.fillText(`單元測驗最高成績 ${score} 分`,800,770);c.fillStyle="#557176";c.font="26px sans-serif";c.fillText(`證書編號：${id}`,800,860);c.fillText(`完成日期：${new Intl.DateTimeFormat("zh-TW",{dateStyle:"long"}).format(new Date())}`,800,910);const a=document.createElement("a");a.href=canvas.toDataURL("image/png");a.download=`五年級第三單元證書-${name}.png`;a.click()}
+
+export default function Unit3(){
+  const [saved,setSaved]=useState<Saved>(emptySaved),[ready,setReady]=useState(false),[answers,setAnswers]=useState<number[]>(Array(15).fill(-1)),[result,setResult]=useState<number|null>(null),[highlights,setHighlights]=useState<string[]>([]),[openGuide,setOpenGuide]=useState<string|null>(null);
+  useEffect(()=>{const t=setTimeout(()=>{try{const raw=localStorage.getItem(STORE);if(raw){const value={...emptySaved,...JSON.parse(raw)};setSaved(value);setAnswers(value.quizAnswers)}}catch{localStorage.removeItem(STORE)}setReady(true)},0);return()=>clearTimeout(t)},[]);
+  useEffect(()=>{if(ready)localStorage.setItem(STORE,JSON.stringify(saved))},[saved,ready]);
+  useEffect(()=>{const nodes=document.querySelectorAll(".unit3 .learning-activity");const observer=new IntersectionObserver(entries=>{if(entries.some(entry=>entry.isIntersecting&&entry.intersectionRatio>=.18))setOpenGuide(null)},{threshold:[.18]});nodes.forEach(node=>observer.observe(node));return()=>observer.disconnect()},[]);
+  const lessonDone=lessons.map(lesson=>lesson.challenges.every((_,i)=>saved.correct[`u3l${lesson.id}c${i}`])&&saved.correct[`u3l${lesson.id}s`]);
+  const completed=Object.values(saved.correct).filter(Boolean).length,progress=Math.round(completed/8*100),eligible=lessonDone.every(Boolean)&&saved.quizBest>=80;
+  const review=useMemo(()=>quiz.filter((_,i)=>answers[i]!==-1&&answers[i]!==quiz[i].answer).map(q=>q.concept).filter((v,i,a)=>a.indexOf(v)===i),[answers]);
+  function submit(){if(answers.some(a=>a<0)){setResult(-1);return}const score=Math.round(answers.filter((answer,i)=>answer===quiz[i].answer).length/15*100);setResult(score);setSaved(current=>({...current,quizBest:Math.max(current.quizBest,score),quizAnswers:answers}))}
+  function hint(lesson:number,cards:number[]|null){setHighlights(cards?cards.map(card=>`${lesson}-${card}`):[])}
+  return <main className="unit3 grade6-unit1 grade6-unit2">
+    <section className="hero hero-grade6 hero-unit3" aria-labelledby="unit3-title"><nav className="topbar"><Link className="brand" href="/courses"><span className="brand-mark">島</span><span>115 社會自主學習網</span></Link><div className="nav-links"><Link href="/courses">課程入口</Link><a href="#missions">任務</a><a href="#quiz">測驗</a><a href="#finish">證書</a></div><span className="progress-pill">探索進度 {progress}%</span></nav><div className="g6-hero-image" aria-hidden="true"><img src={`${assetBase}/unit3/qing-taiwan-transformation-hero.png`} alt=""/></div><div className="hero-grid" id="top"><div className="g6-hero-copy"><p className="eyebrow">五年級社會・第三單元</p><h1 id="unit3-title">渡海、開墾，<br/><em>臺灣如何走向世界？</em></h1><p className="lead">跟著移民、水圳、港口與鐵路留下的線索，讀懂清帝國時期臺灣社會的建立、衝突與轉變。</p><a className="primary-button" href="#base">開始追蹤轉變 <span>→</span></a><p className="privacy-note">免登入即可學習・進度只保存在這個裝置</p></div></div><div className="wave"/></section>
+    <section className="section base-section" id="base"><div className="section-heading"><div><p className="eyebrow dark">出發前・先備知識不計分</p><h2>因果推理暖身</h2></div><p>先回想人口移動、公共建設與外力衝擊的基本因果。答錯會得到提示，不影響任務進度。</p></div><div className="warmups">{warmups.map((q,i)=><ChoiceTask key={q.prompt} item={q} taskKey={`u3warm${i}`} saved={saved} setSaved={setSaved} unscored/>)}</div></section>
+    <section className="mission-overview" id="missions"><div><p className="eyebrow">本單元任務</p><h2>兩座歷史轉變調查站</h2><p>每站閱讀 3 張圖文知識卡，操作探究工具，再完成 3 題挑戰與 1 題生活情境。</p><Link className="next-unit-link" href="/courses">← 返回課程入口</Link></div><div className="badge-row unit2-badges">{lessons.map((lesson,i)=><a key={lesson.id} href={`#u3-lesson-${lesson.id}`} className={lessonDone[i]?"badge won":"badge"}><span>{lessonDone[i]?"✓":lesson.icon}</span><b>{lesson.title}</b><small>{lessonDone[i]?"徽章已取得":"等待探索"}</small></a>)}</div></section>
+    {lessons.map((lesson,li)=><section key={lesson.id} className={`lesson ${lesson.id===2?"lesson-ochre":"lesson-green"}`} id={`u3-lesson-${lesson.id}`}><div className="section lesson-inner"><header className="lesson-header"><div className="lesson-number">0{lesson.id}</div><div><p className="eyebrow dark">{lesson.kicker}</p><h2>{lesson.title}</h2><p>{lesson.question}</p></div><div className={`big-badge ${lessonDone[li]?"won":""}`}>{lessonDone[li]?"✓":lesson.icon}<small>{lessonDone[li]?"完成":"進行中"}</small></div></header><div className="concept-strip">{lesson.concepts.map(x=><span key={x}>{x}</span>)}</div><div className="cards">{lesson.cards.map((card,i)=>{const key=`${lesson.id}-${i}`,isOpen=openGuide===key;return <article key={card.title} id={`u3-${lesson.id}-card-${i}`} tabIndex={-1} className={`knowledge-card ${highlights.includes(key)?"is-hint":""}`}><span className="card-count">0{i+1}</span><p className="card-tag">{card.tag}</p><h3>{card.title}</h3><div className="card-visual">{card.visual.map((x,j)=><span key={x}><b>{x}</b>{j<card.visual.length-1&&<i aria-hidden="true">→</i>}</span>)}</div><p className="card-body">{card.text}</p><p className="card-bridge"><b>思考提示｜想一想為什麼？</b>{card.bridge}</p><button className="guide-toggle" aria-expanded={isOpen} aria-controls={`u3-guide-${key}`} onClick={()=>setOpenGuide(isOpen?null:key)}>{isOpen?"收起參考想法":"需要引導？看參考想法"}<span aria-hidden="true">{isOpen?"−":"＋"}</span></button>{isOpen&&<div className="card-guide" id={`u3-guide-${key}`} role="status"><b>引導參考</b><p>{card.guide}</p><small>這是思考方向，不是要背下來的標準句子。</small></div>}</article>})}</div><div className="learning-activity" onPointerDown={()=>setOpenGuide(null)} onFocusCapture={()=>setOpenGuide(null)}>{lesson.id===1?<Sorter onHint={cards=>hint(1,cards)}/>:<ChainPuzzle onHint={cards=>hint(2,cards)}/>}<div className="challenge-zone"><div className="zone-heading"><p className="eyebrow dark">證據挑戰</p><h3>用知識卡完成 3 關</h3></div>{lesson.challenges.map((q,i)=><ChoiceTask key={q.prompt} item={q} taskKey={`u3l${lesson.id}c${i}`} saved={saved} setSaved={setSaved} onHint={cards=>hint(lesson.id,cards)}/>)}</div><div className="scenario"><div className="scenario-label">生活情境題</div><ChoiceTask item={lesson.scenario} taskKey={`u3l${lesson.id}s`} saved={saved} setSaved={setSaved} onHint={cards=>hint(lesson.id,cards)}/></div></div></div></section>)}
+    <section className="section quiz-section" id="quiz"><div className="section-heading"><div><p className="eyebrow dark">最後檢核・不限次重試</p><h2>15 題單元測驗</h2></div><div className="score-orb"><span>{saved.quizBest}</span><small>最高分</small></div></div><p className="quiz-note">完成全部題目再送出；每題都有解析，未達 80 分可依複習方向再挑戰。</p><div className="quiz-list">{quiz.map((q,i)=><fieldset key={q.prompt}><legend><span>{String(i+1).padStart(2,"0")}</span>{q.prompt}</legend>{q.options.map((o,j)=><label key={o} className={answers[i]===j?"selected":""}><input type="radio" name={`u3q${i}`} checked={answers[i]===j} onChange={()=>setAnswers(current=>current.map((value,k)=>k===i?j:value))}/>{o}</label>)}{result!==null&&result>=0&&<p className={answers[i]===q.answer?"explain correct":"explain incorrect"}>{answers[i]===q.answer?"✓":"→"} {q.why}</p>}</fieldset>)}</div><button className="submit-button" onClick={submit}>送出 15 題答案</button>{result===-1&&<p className="feedback try" role="alert">還有題目沒完成，請檢查每一題。</p>}{result!==null&&result>=0&&<div className={`result-panel ${result>=80?"pass":"review"}`} role="status"><span className="result-score">{result}</span><div><h3>{result>=80?"通過挑戰！":"再複習一次就更穩了"}</h3><p>{result>=80?"已達 80 分門檻。完成兩站任務後即可領取圖片證書。":`建議複習：${review.join("、")||"錯題解析"}。`}</p></div></div>}</section>
+    <section className="finish" id="finish"><div className="section finish-grid"><div><p className="eyebrow">結業站</p><h2>{eligible?"歷史轉變觀察力已解鎖！":"再完成一點，就能領證書。"}</h2><p className="finish-lead">{eligible?"你能從移民、水利、港口、戰爭與文化交流的證據，解釋清帝國時期臺灣社會的轉變。輸入姓名即可下載 PNG 圖片證書。":"完成兩枚任務徽章，並讓測驗最高分達 80 分，即可解鎖第三單元證書。"}</p><div className="checklist">{lessonDone.map((done,i)=><p key={i} className={done?"done":""}><span>{done?"✓":"○"}</span>{lessons[i].title}：挑戰與生活情境</p>)}<p className={saved.quizBest>=80?"done":""}><span>{saved.quizBest>=80?"✓":"○"}</span>單元測驗最高分達 80 分</p></div></div><div className="certificate-card"><div className="cert-mark">調查員</div><p>學習回饋</p><h3>{saved.name||"你的名字"}</h3><p>{completed===8?"你已完成 8 項任務，能用證據解釋清領臺灣的重要轉變。":`已完成 ${completed}／8 項任務，下一步前往尚未取得的徽章。`}</p><label>證書姓名<input value={saved.name} maxLength={20} placeholder="請輸入姓名" onChange={e=>setSaved(current=>({...current,name:e.target.value}))}/></label><button disabled={!eligible||!saved.name.trim()} onClick={()=>makeCertificate(saved.name.trim(),saved.quizBest)}>下載 PNG 圖片證書</button><small>姓名與進度只留在本機，不會上傳。證書編號本身不會連結個人紀錄。</small></div></div></section>
+    <footer><Link className="brand" href="/courses"><span className="brand-mark">島</span><span>115 社會自主學習網</span></Link><p>依據五年級第三單元教材概念重新設計，未重製課本頁面與插圖。</p><button onClick={()=>{if(confirm("確定清除五年級第三單元的本機進度嗎？")){localStorage.removeItem(STORE);location.reload()}}}>清除本單元進度</button></footer>
+  </main>
+}

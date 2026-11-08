@@ -4,6 +4,7 @@ import "../../app/globals.css";
 import Home from "../../app/page";
 import Courses from "../../app/courses/page";
 import Unit2 from "../../app/unit2/page";
+import Unit3 from "../../app/unit3/page";
 import Grade6Unit1 from "../../app/grade6/unit1/page";
 import Grade6Unit2 from "../../app/grade6/unit2/page";
 
@@ -13,6 +14,8 @@ const Page = pathname.startsWith("/grade6/unit2")
   ? Grade6Unit2
   : pathname.startsWith("/grade6/unit1")
   ? Grade6Unit1
+  : pathname.startsWith("/unit3")
+  ? Unit3
   : pathname.startsWith("/unit2")
   ? Unit2
   : pathname.startsWith("/unit1")
