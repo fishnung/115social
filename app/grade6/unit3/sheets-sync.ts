@@ -1,7 +1,7 @@
 import type { AnswerRecord, QuizSubmission, StudentProgress } from "./progress";
 
-// Apps Script 更新為支援 G6U3 後，再填入與五年級共用的 /exec 網址。
-export const G6U3_SHEETS_ENDPOINT = "";
+// 五、六年級第三單元共用同一個 Apps Script 與 Google 試算表。
+export const G6U3_SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwfPtqPh2aeuX7tcqwruR0YxobwKhtNsf3neTNE65PEECgLyG2Rgw2bzSN0_GRC8Hfh/exec";
 
 const QUEUE_KEY = "taiwan-explorer-grade6-unit3-sheets-queue-v1";
 
