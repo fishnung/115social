@@ -1,7 +1,7 @@
 import type { AnswerRecord, QuizSubmission, StudentProgress } from "./progress";
 
 // 完成 Google Apps Script 部署後，將 /exec 網址貼在這裡。
-export const G5U3_SHEETS_ENDPOINT = "";
+export const G5U3_SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwfPtqPh2aeuX7tcqwruR0YxobwKhtNsf3neTNE65PEECgLyG2Rgw2bzSN0_GRC8Hfh/exec";
 
 const QUEUE_KEY = "taiwan-explorer-unit3-sheets-queue-v1";
 
