@@ -20,6 +20,7 @@ export type AnswerRecord = {
 
 export type DiagnosisSubmission = { submittedAt:string; answers:AnswerRecord[] };
 export type QuizSubmission = { submittedAt:string; attemptNumber:number; score:number; answers:AnswerRecord[] };
+export type QuizSummary = { firstScore:number|null; attemptCount:number; finalScore:number|null; finalSubmittedAt:string|null };
 
 export type StudentProgress = {
   studentKey:string;
@@ -39,6 +40,7 @@ export type StudentProgress = {
     toolChecks:Record<string,{completed:boolean;checkedAt:string}>;
     quizDraft:number[];
     quizSubmissions:QuizSubmission[];
+    quizSummary:QuizSummary;
     bestScore:number;
     completedAt:string|null;
   };
@@ -64,7 +66,7 @@ export function emptyStudent(seat:string):StudentProgress{
   return {
     studentKey:studentKey(seat),seat,classCode:CLASS_CODE,unitId:UNIT_ID,name:"",
     pre:{warmups:{},cardsReviewedAt:null,diagnosis:null,unclearConcept:"",completedAt:null},
-    post:{correct:{},toolChecks:{},quizDraft:Array(15).fill(-1),quizSubmissions:[],bestScore:0,completedAt:null},
+    post:{correct:{},toolChecks:{},quizDraft:Array(15).fill(-1),quizSubmissions:[],quizSummary:{firstScore:null,attemptCount:0,finalScore:null,finalSubmittedAt:null},bestScore:0,completedAt:null},
     records:[],
   };
 }
