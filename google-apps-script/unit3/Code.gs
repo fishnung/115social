@@ -11,6 +11,11 @@ const QUIZ_HEADERS = [
   '本次成績','首次成績','目前最高分','提交時間'
 ];
 
+const ALLOWED_UNITS = {
+  G5U3: '501',
+  G6U3: '601'
+};
+
 function setup() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   if (!ss) throw new Error('請從目標 Google 試算表開啟 Apps Script，再執行 setup。');
@@ -53,8 +58,10 @@ function openSpreadsheet_() {
 
 function validatePayload_(payload) {
   if (!payload || payload.schemaVersion !== 1) throw new Error('不支援的資料版本');
-  if (payload.unitId !== 'G5U3' || payload.classCode !== '501') throw new Error('單元或班級不符');
-  if (!/^501-\d{2}$/.test(String(payload.studentKey || ''))) throw new Error('學生代碼格式錯誤');
+  const expectedClass = ALLOWED_UNITS[payload.unitId];
+  if (!expectedClass || payload.classCode !== expectedClass) throw new Error('單元或班級不符');
+  if (String(payload.studentKey || '') !== `${expectedClass}-${String(payload.seat || '')}`) throw new Error('學生代碼格式錯誤');
+  if (!/^\d{2}$/.test(String(payload.seat || ''))) throw new Error('座號格式錯誤');
   if (!Array.isArray(payload.records) || payload.records.length > 200) throw new Error('作答資料格式錯誤');
   if (!String(payload.eventId || '')) throw new Error('缺少提交編號');
 }

@@ -199,6 +199,13 @@ footer { padding: 36px max(20px, calc((100% - 1120px)/2)); display: flex; align-
 .g6-hero-copy { padding: 28px 32px 32px; border: 1px solid rgba(255,255,255,.18); border-radius: 28px; background: rgba(4,48,63,.48); backdrop-filter: blur(5px); box-shadow: 0 28px 80px rgba(0,27,39,.28); }
 .hero-g6u2::after { background: linear-gradient(90deg,rgba(3,37,54,.98) 0%,rgba(3,37,54,.86) 35%,rgba(3,37,54,.17) 68%,rgba(3,37,54,.04) 100%); }
 .hero-g6u2 .g6-hero-image img { object-position: center; }
+.hero-g6u3 { background: #063d59; }
+.hero-g6u3::after { background: linear-gradient(90deg,rgba(3,45,57,.98) 0%,rgba(3,57,67,.84) 38%,rgba(3,45,57,.17) 69%,rgba(3,45,57,.04) 100%); }
+.hero-g6u3 .g6-hero-image img { object-position: center; }
+.hero-g6u3 .g6-hero-copy h1 { font-size: clamp(3rem,5.35vw,4.6rem); line-height: 1.08; }
+.g6u3 .big-badge { background: linear-gradient(145deg,#f4c95d,#0f9f91); }
+.g6u3 .knowledge-card.is-hint::after { content: "提示卡：線索在這裡"; }
+.unit3.g6u3 .card-image-infographic img { aspect-ratio: 1 / 1; }
 .hero-unit3 { background: #402014; }
 .hero-unit3::after { background: linear-gradient(90deg,rgba(39,19,14,.97) 0%,rgba(56,31,19,.84) 36%,rgba(39,26,13,.18) 70%,rgba(39,26,13,.04) 100%); }
 .hero-unit3 .g6-hero-image img { object-position: center; }
